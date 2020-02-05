@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<mixerSettings>
+	<Mixer>
+		<Preview>
+			<doPreview>1</doPreview>
+			<channelSelect>2</channelSelect>
+		</Preview>
+		<Background>
+			<BasicColor>247, 219, 0, 255</BasicColor>
+			<Opacity>0.882653</Opacity>
+		</Background>
+		<A>
+			<Tint>
+				<Hue>0.156601</Hue>
+				<Saturation>1</Saturation>
+				<Brightness>1</Brightness>
+				<TintAmt>0.750104</TintAmt>
+			</Tint>
+			<Contrast>1</Contrast>
+			<Gain>1</Gain>
+			<Opacity>1</Opacity>
+			<blendMode>4</blendMode>
+		</A>
+		<B>
+			<Tint>
+				<Hue>0.213869</Hue>
+				<Saturation>1</Saturation>
+				<Brightness>1</Brightness>
+				<TintAmt>0.973969</TintAmt>
+			</Tint>
+			<Contrast>1</Contrast>
+			<Gain>4.5102</Gain>
+			<Opacity>1</Opacity>
+			<blendMode>9</blendMode>
+		</B>
+	</Mixer>
+	<Background>255, 0, 0, 255</Background>
+</mixerSettings>

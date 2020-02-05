@@ -1,0 +1,4 @@
+ofxAutoReloadedShader
+ofxGpuMixer
+ofxGui
+ofxSceneTEST
