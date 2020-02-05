@@ -6,7 +6,7 @@
 			<channelSelect>2</channelSelect>
 		</Preview>
 		<Background>
-			<BasicColor>97, 104, 95, 255</BasicColor>
+			<BasicColor>2, 79, 5, 255</BasicColor>
 			<Opacity>1</Opacity>
 		</Background>
 		<A>
@@ -16,22 +16,22 @@
 				<Brightness>1</Brightness>
 				<TintAmt>0.786547</TintAmt>
 			</Tint>
-			<Contrast>0.795918</Contrast>
-			<Gain>4.20408</Gain>
-			<Opacity>1</Opacity>
-			<blendMode>4</blendMode>
+			<Contrast>0.44898</Contrast>
+			<Gain>3.89796</Gain>
+			<Opacity>0.765306</Opacity>
+			<blendMode>6</blendMode>
 		</A>
 		<B>
 			<Tint>
-				<Hue>0</Hue>
-				<Saturation>0</Saturation>
+				<Hue>0.812578</Hue>
+				<Saturation>1</Saturation>
 				<Brightness>1</Brightness>
-				<TintAmt>0</TintAmt>
+				<TintAmt>1</TintAmt>
 			</Tint>
-			<Contrast>1</Contrast>
-			<Gain>5</Gain>
+			<Contrast>0.857143</Contrast>
+			<Gain>4.18367</Gain>
 			<Opacity>1</Opacity>
-			<blendMode>2</blendMode>
+			<blendMode>9</blendMode>
 		</B>
 	</Mixer>
 	<Background>255, 0, 0, 255</Background>

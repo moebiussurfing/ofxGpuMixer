@@ -101,3 +101,5 @@ example2/example2.vcxproj
 example2/example2.vcxproj.filters
 example2/example2.vcxproj.user
 example2/icon.rc
+example2/bin/data/mixerSettings.xml
+example2/bin/data/ofxSceneTEST/scene.xml
