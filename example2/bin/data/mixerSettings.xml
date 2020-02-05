@@ -2,36 +2,36 @@
 <mixerSettings>
 	<Mixer>
 		<Preview>
-			<doPreview>1</doPreview>
+			<doPreview>0</doPreview>
 			<channelSelect>2</channelSelect>
 		</Preview>
 		<Background>
-			<BasicColor>247, 219, 0, 255</BasicColor>
-			<Opacity>0.882653</Opacity>
+			<BasicColor>97, 104, 95, 255</BasicColor>
+			<Opacity>1</Opacity>
 		</Background>
 		<A>
 			<Tint>
-				<Hue>0.156601</Hue>
-				<Saturation>1</Saturation>
+				<Hue>0.146189</Hue>
+				<Saturation>0.677218</Saturation>
 				<Brightness>1</Brightness>
-				<TintAmt>0.750104</TintAmt>
+				<TintAmt>0.786547</TintAmt>
 			</Tint>
-			<Contrast>1</Contrast>
-			<Gain>1</Gain>
+			<Contrast>0.795918</Contrast>
+			<Gain>4.20408</Gain>
 			<Opacity>1</Opacity>
-			<blendMode>4</blendMode>
+			<blendMode>2</blendMode>
 		</A>
 		<B>
 			<Tint>
-				<Hue>0.213869</Hue>
-				<Saturation>1</Saturation>
+				<Hue>0</Hue>
+				<Saturation>0</Saturation>
 				<Brightness>1</Brightness>
-				<TintAmt>0.973969</TintAmt>
+				<TintAmt>0</TintAmt>
 			</Tint>
 			<Contrast>1</Contrast>
-			<Gain>4.5102</Gain>
+			<Gain>5</Gain>
 			<Opacity>1</Opacity>
-			<blendMode>9</blendMode>
+			<blendMode>7</blendMode>
 		</B>
 	</Mixer>
 	<Background>255, 0, 0, 255</Background>
