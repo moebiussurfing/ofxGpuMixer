@@ -31,7 +31,7 @@
 			<Contrast>0.857143</Contrast>
 			<Gain>4.18367</Gain>
 			<Opacity>1</Opacity>
-			<blendMode>9</blendMode>
+			<blendMode>7</blendMode>
 		</B>
 	</Mixer>
 	<Background>255, 0, 0, 255</Background>
