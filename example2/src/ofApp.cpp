@@ -62,8 +62,13 @@ void ofApp::update(){
 void ofApp::draw(){
     ofBackground(0);
     ofSetColor(255);
-    mixer.draw(0,0,ofGetWidth(), ofGetHeight());
+
+	////raw draw
+ //   mixer.draw(0,0,ofGetWidth(), ofGetHeight());
     
+	//fliped draw
+	mixer.drawFbo(0, 0, ofGetWidth(), ofGetHeight());
+
     gui.draw();
 }
 

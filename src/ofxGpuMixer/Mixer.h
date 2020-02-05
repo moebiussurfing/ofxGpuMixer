@@ -19,9 +19,11 @@ public:
     ofParameter<float> gain{"Gain", 1.0, 1., 5.};
     ofParameter<float> opacity{"Opacity", 1., 0., 1.};
     ofParameter<int> blendMode{"blendMode", 1, 1, PASS_THROUGH};
-    
-    ofParameterGroup parametersTint{"Tint", hue, saturation, brightness, tintAmt};
-    ofParameterGroup parameters{"Channel", parametersTint, contrast, gain, opacity, blendMode};
+	ofParameter<string> blendModeName{ "", "" };//to set blend mode gui name
+	int blendMode_PRE;//to avoid use of callback that crashes..
+	
+	ofParameterGroup parametersTint{"Tint", hue, saturation, brightness, tintAmt};
+    ofParameterGroup parameters{"Channel", parametersTint, contrast, gain, opacity, blendMode, blendModeName };
     
     string name;
     
@@ -32,7 +34,10 @@ public:
         this->blendMode = blendMode;
         this->name = name;
         this->texture = texture;
-    }
+	
+		this->blendModeName.setSerializable(false);//to not include into xml settings
+		this->blendMode_PRE = -1;
+	}
     
     void parametersWithoutBlendMode(){
         parameters.clear();
@@ -53,6 +58,7 @@ public:
     
     ofParameterGroup parameterPreview{"Preview", doPreview, channelSelect};
     
+	ofFbo fboMix;//to v flip
     
     void setup(){
         
@@ -69,14 +75,38 @@ public:
         
         generateShader();
         generateShaderSingleChannel();
+
+		setupFbo();//to v flip
     }
     
     void update(){
-        for(auto t : texGroups){
+		//debug
+		//int it = 0;
+		//int ic = 0;
+		for(auto & t : texGroups){//must add '&' to enable (read and) write too
             for( auto c : channels){
                 if(t.name == c->name && t.opacity > 0) c->update();
+
+				//ofLogNotice("TextureGroup") << "[" << ic << "] c: " << c->name;
+				//ic++;
             }
+
+			//to set blend mode gui name
+			if (t.blendMode != t.blendMode_PRE)
+			{
+				//ofLogNotice("TextureGroup") << "[" << it << "] t: "<< t.name;
+				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode_PRE: " << t.blendMode_PRE;
+				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode: " << t.blendMode;
+				t.blendMode_PRE = t.blendMode.get();
+				t.blendModeName = getNameFromBlendMode(t.blendMode);
+			}
+			//it++;
         }
+
+		//to v flip
+		updateFbo();
+
+		//ofLogNotice("TextureGroup") << "";
     }
     
     void draw(int x, int y, int w, int h){
@@ -242,6 +272,117 @@ private:
         shaderSingleChannel.setupShaderFromSource(GL_FRAGMENT_SHADER, shaderScript.str());
         shaderSingleChannel.linkProgram();
     }
+
+	//WORKAROUND: ineficient but avoids the calback crashes.
+	//works on every frame...
+	//--------------------------------------------------------------
+	std::string getNameFromBlendMode(int blendMode)
+	{
+		std::string s;
+
+		//BLEND_PASS = 0,
+		//BLEND_ADD = 1,
+		//BLEND_MULTIPLY = 2,
+		//BLEND_LIGHTEN = 3,
+		//BLEND_DARKEN = 4,
+		//BLEND_SUBTRACT = 5,
+		//BLEND_SCREEN = 6,
+		//BLEND_AVERAGE = 7,
+		//BLEND_SOFT_LIGHT = 8,
+		//BLEND_OVERLAY = 9,
+		//PASS_THROUGH = 10
+
+		switch (blendMode)
+		{
+		case 0:
+			s = "BLEND_PASS";
+			break;
+		case 1:
+			s = "BLEND_ADD";
+			break;
+		case 2:
+			s = "BLEND_MULTIPLY";
+			break;
+		case 3:
+			s = "BLEND_LIGHTEN";
+			break;
+		case 4:
+			s = "BLEND_DARKEN";
+			break;
+		case 5:
+			s = "BLEND_SUBTRACT";
+			break;
+		case 6:
+			s = "BLEND_SCREEN";
+			break;
+		case 7:
+			s = "BLEND_AVERAGE";
+			break;
+		case 8:
+			s = "BLEND_SOFT_LIGHT";
+			break;
+		case 9:
+			s = "BLEND_OVERLAY";
+			break;
+		case 10:
+			s = "PASS_THROUGH";
+			break;
+		default:
+			s = "unknown blendMode";
+			ofLogError("TextureGroup") << "unknown blendMode: " << blendMode;
+			break;
+		}
+		ofLogNotice("TextureGroup") << "blendModeName: ["<< blendMode <<"] " << s;
+
+		return s;
+	}
+
+
+	//WORKAROUND: to flip drawing easy
+
+	//--------------------------------------------------------------
+	void setupFbo()
+	{
+		ofFbo::Settings setting;
+		setting.width = ofGetWidth();
+		setting.height = ofGetHeight();
+		setting.internalformat = GL_RGBA;
+		//allocate
+		fboMix.allocate(setting);
+
+		//clear
+		fboMix.begin();
+		ofClear(0, 0, 0, 255);
+		fboMix.end();
+	}
+	
+	//--------------------------------------------------------------
+	void updateFbo()
+	{
+		fboMix.begin();
+		ofClear(0, 0, 0, 255);
+		draw(0, 0, ofGetWidth(), ofGetHeight());
+		//ofClearAlpha();//
+		fboMix.end();
+	}
+
+public:
+
+	//--------------------------------------------------------------
+	void drawFbo()
+	{
+		fboMix.draw(0, 0, ofGetWidth(), ofGetHeight());
+	}
+	//--------------------------------------------------------------
+	void drawFbo(int x, int y, int w, int h)
+	{
+		fboMix.draw(x, y, w, h);
+	}
+	//--------------------------------------------------------------
+	void drawFbo(int x, int y)
+	{
+		fboMix.draw(x, y, ofGetWidth(), ofGetHeight());
+	}
 };
 
 
