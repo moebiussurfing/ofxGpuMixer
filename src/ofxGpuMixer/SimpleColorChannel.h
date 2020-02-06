@@ -42,7 +42,7 @@ public:
     }
     
     void setupParameterGroup(string name, ofColor color){
-            parameterGroup.add(this->color.set("BasicColor", color, ofColor::black, ofColor::white));
+            parameterGroup.add(this->color.set("COLOR", color, ofColor::black, ofColor::white));
     }
     
 private:

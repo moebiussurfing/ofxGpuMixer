@@ -11,19 +11,19 @@ OFX_GPUMIXER_BEGIN_NAMESPACE
 class TextureGroup {
 public:
 
-	ofParameter<float> hue{ "Hue",0.5, 0, 1. };
-	ofParameter<float> saturation{ "Saturation",1, 0, 1. };
-	ofParameter<float> brightness{ "Brightness",1, 0, 1. };
-	ofParameter<float> tintAmt{ "TintAmt", 0, 0., 1 };
-	ofParameter<float> contrast{ "Contrast", 1., 0., 2. };
-	ofParameter<float> gain{ "Gain", 1.0, 1., 5. };
-	ofParameter<float> opacity{ "Opacity", 1., 0., 1. };
-	ofParameter<int> blendMode{ "blendMode", 1, 1, PASS_THROUGH };
+	ofParameter<float> hue{ "HUE",0.5, 0, 1. };
+	ofParameter<float> saturation{ "SATURATION",1, 0, 1. };
+	ofParameter<float> brightness{ "BRIGHTNESS",1, 0, 1. };
+	ofParameter<float> tintAmt{ "TINT AMOUNT", 0, 0., 1 };
+	ofParameter<float> contrast{ "CONTRAST", 1., 0., 2. };
+	ofParameter<float> gain{ "GAIN", 1.0, 1., 5. };
+	ofParameter<float> opacity{ "OPACITY", 1., 0., 1. };
+	ofParameter<int> blendMode{ "BLEND MODE", 1, 1, PASS_THROUGH };
 	ofParameter<string> blendModeName{ "", "" };//to set blend mode gui name
 	int blendMode_PRE;//to avoid use of callback that crashes..
 
-	ofParameterGroup parametersTint{ "Tint", hue, saturation, brightness, tintAmt };
-	ofParameterGroup parameters{ "Channel", parametersTint, contrast, gain, opacity, blendMode, blendModeName };
+	ofParameterGroup parametersTint{ "TINT", hue, saturation, brightness, tintAmt };
+	ofParameterGroup parameters{ "CHANNEL", parametersTint, contrast, gain, opacity, blendMode, blendModeName };
 
 	string name;
 
@@ -53,10 +53,10 @@ class Mixer {
 public:
 
 	vector<BasicChannel*> channels;
-	ofParameter<bool> doPreview{ "doPreview", false };
-	ofParameter<int> channelSelect{ "channelSelect", 0, 0, 0 };
+	ofParameter<bool> doPreview{ "SOLO", false };
+	ofParameter<int> channelSelect{ "CHANNEL", 0, 0, 0 };
 
-	ofParameterGroup parameterPreview{ "Preview", doPreview, channelSelect };
+	ofParameterGroup parameterPreview{ "PREVIEW", doPreview, channelSelect };
 
 	ofFbo fboMix;//to v flip
 
@@ -88,7 +88,7 @@ public:
 
 		//ParameterGroup
 		parameterGroup.clear();
-		parameterGroup.setName("Mixer");
+		parameterGroup.setName("MIXER");
 
 		channelSelect.setMax(texGroups.size() - 1);
 		parameterGroup.add(parameterPreview);
