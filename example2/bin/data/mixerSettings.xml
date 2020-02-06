@@ -13,25 +13,25 @@
 			<Tint>
 				<Hue>0.682424</Hue>
 				<Saturation>1</Saturation>
-				<Brightness>1</Brightness>
-				<TintAmt>0.849021</TintAmt>
+				<Brightness>0.250312</Brightness>
+				<TintAmt>0.427322</TintAmt>
 			</Tint>
-			<Contrast>2</Contrast>
+			<Contrast>1.31633</Contrast>
 			<Gain>3.89796</Gain>
-			<Opacity>0.438776</Opacity>
+			<Opacity>0.510204</Opacity>
 			<blendMode>5</blendMode>
 		</A>
 		<B>
 			<Tint>
 				<Hue>0.135777</Hue>
-				<Saturation>1</Saturation>
-				<Brightness>0.515827</Brightness>
+				<Saturation>0.271137</Saturation>
+				<Brightness>0.557476</Brightness>
 				<TintAmt>0.838609</TintAmt>
 			</Tint>
 			<Contrast>0.857143</Contrast>
-			<Gain>4.18367</Gain>
-			<Opacity>1</Opacity>
-			<blendMode>5</blendMode>
+			<Gain>3.63265</Gain>
+			<Opacity>0.647959</Opacity>
+			<blendMode>7</blendMode>
 		</B>
 	</Mixer>
 	<Background>255, 0, 0, 255</Background>

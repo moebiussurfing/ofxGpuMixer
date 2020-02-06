@@ -131,7 +131,9 @@ void ofApp::mouseExited(int x, int y){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+	////BUG:
+	//fboA.allocate(w, h);
+	//fboB.allocate(w, h);
 }
 
 //--------------------------------------------------------------
