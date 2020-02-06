@@ -347,6 +347,7 @@ private:
 		setting.width = ofGetWidth();
 		setting.height = ofGetHeight();
 		setting.internalformat = GL_RGBA;
+
 		//allocate
 		fboMix.allocate(setting);
 
