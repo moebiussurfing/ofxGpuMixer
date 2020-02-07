@@ -83,7 +83,11 @@ public:
 	{
 		return texGroups[channelSelect.get()].blendMode.get();
 	}
-
+    std::string getBlendModeName()
+    {
+        return texGroups[channelSelect.get()].blendModeName.get();
+    }
+    
 	void setup() {
 
 		//ParameterGroup
