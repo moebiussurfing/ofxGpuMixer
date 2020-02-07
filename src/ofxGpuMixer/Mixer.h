@@ -56,11 +56,39 @@ public:
 	ofParameter<bool> doPreview{ "SOLO", false };
 	ofParameter<int> channelSelect{ "CHANNEL", 0, 0, 0 };
 
+	//easy callback to update gui when params change
+	bool bGuiMustUpdate = false;
+	bool isUpdated()
+	{
+		if (bGuiMustUpdate)
+		{
+			bGuiMustUpdate = false;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	void Changed_channelSelect(int & channelSelect)
+	{
+		bGuiMustUpdate = true;
+	}
+
 	ofParameterGroup parameterPreview{ "PREVIEW", doPreview, channelSelect };
 
 	ofFbo fboMix;//to v flip
 
+	//API
 	//control gui by code
+	void setSolo(bool b)
+	{
+		doPreview = b;
+	}
+	void toggleSolo()
+	{
+		doPreview = !doPreview.get();
+	}
 	int getLastChannel()
 	{
 		return channelSelect.getMax();
@@ -83,11 +111,11 @@ public:
 	{
 		return texGroups[channelSelect.get()].blendMode.get();
 	}
-    std::string getBlendModeName()
-    {
-        return texGroups[channelSelect.get()].blendModeName.get();
-    }
-    
+	std::string getBlendModeName()
+	{
+		return texGroups[channelSelect.get()].blendModeName.get();
+	}
+
 	void setup() {
 
 		//ParameterGroup
@@ -96,6 +124,7 @@ public:
 
 		channelSelect.setMax(texGroups.size() - 1);
 		parameterGroup.add(parameterPreview);
+		channelSelect.addListener(this, &Mixer::Changed_channelSelect);
 
 		for (int i = 0; i < texGroups.size(); i++) {
 			parameterGroup.add(texGroups[i].parameters);
@@ -221,11 +250,11 @@ public:
 		texGroups.push_back(texGroup);
 	}
 
-	/*    void addChannel(ShaderChannel & channel, int blendMode){
-	 addChannel(channel.getFbo(), channel.getName(), blendMode);
-	 channels.push_back(&channel);
-	 }
-	 */
+	//void addChannel(ShaderChannel & channel, int blendMode) {
+	//	addChannel(channel.getFbo(), channel.getName(), blendMode);
+	//	channels.push_back(&channel);
+	//}
+
 	void addChannel(SimpleColorChannel &  channel, int blendMode) {
 		bool isFirstCol = isFirst;
 		addChannel(channel.getFbo(), channel.getName(), blendMode);
