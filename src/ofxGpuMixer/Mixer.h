@@ -7,6 +7,7 @@
 
 OFX_GPUMIXER_BEGIN_NAMESPACE
 
+//--------------------------------------------------------------
 
 class TextureGroup {
 public:
@@ -49,15 +50,37 @@ public:
 	}
 };
 
+//--------------------------------------------------------------
+	
 class Mixer {
+
 public:
 
 	vector<BasicChannel*> channels;
 	ofParameter<bool> doPreview{ "SOLO", false };
 	ofParameter<int> channelSelect{ "CHANNEL", 0, 0, 0 };
 
+	ofParameterGroup parameterPreview{ "PREVIEW", doPreview, channelSelect };
+
+	//--
+
+	ofFbo fboMix;//to v flip
+
+	//--------------------------------------------------------------
+
+	//API
+
+	//methods to control object by external gui or by code
+
 	//easy callback to update gui when params change
+
+private:
+
 	bool bGuiMustUpdate = false;
+	bool bChangedColor = false;
+	
+public:
+
 	bool isUpdated()
 	{
 		if (bGuiMustUpdate)
@@ -70,25 +93,47 @@ public:
 			return false;
 		}
 	}
+
 	void Changed_channelSelect(int & channelSelect)
 	{
 		bGuiMustUpdate = true;
 	}
 
-	ofParameterGroup parameterPreview{ "PREVIEW", doPreview, channelSelect };
+	bool isChangedColor()
+	{
+		if (bChangedColor)
+		{
+			bChangedColor = false;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
-	ofFbo fboMix;//to v flip
+	ofColor getColorChannel0()
+	{
+		if (channels[0]->name == "BACKGROUND" && texGroups[0].name == "BACKGROUND")
+		{
+			return  channels[0]->parameterGroup.getColor("COLOR");
+		}
+		else
+		{
+			return ofColor::black;
+		}
+	}
 
-	//API
-	//control gui by code
 	void setSolo(bool b)
 	{
 		doPreview = b;
 	}
+
 	void toggleSolo()
 	{
 		doPreview = !doPreview.get();
 	}
+
 	int getLastChannel()
 	{
 		return channelSelect.getMax();
@@ -98,23 +143,29 @@ public:
 		if (_channel <= channelSelect.getMax() && _channel >= 0)
 			channelSelect = _channel;
 	}
+
 	void setBlendMode(int _blendMode)
 	{
 		if (_blendMode <= texGroups[channelSelect.get()].blendMode.getMax())
 			texGroups[channelSelect.get()].blendMode = _blendMode;
 	}
+
 	int getLastBlendMode()
 	{
 		return texGroups[channelSelect.get()].blendMode.getMax();
 	}
+
 	int getBlendMode()
 	{
 		return texGroups[channelSelect.get()].blendMode.get();
 	}
+
 	std::string getBlendModeName()
 	{
 		return texGroups[channelSelect.get()].blendModeName.get();
 	}
+
+	//--------------------------------------------------------------
 
 	void setup() {
 
@@ -130,40 +181,56 @@ public:
 			parameterGroup.add(texGroups[i].parameters);
 		}
 
+		ofAddListener(parameterGroup.parameterChangedE(), this, &Mixer::Changed_params);//remove listener is pending..
+
 		generateShader();
 		generateShaderSingleChannel();
 
 		setupFbo();//to v flip
 	}
 
+	void Changed_params(ofAbstractParameter &e)
+	{
+		string name = e.getName();
+
+		ofLogVerbose("Mixer") << "Changed_params: " << name << " : " << e;
+
+		if (name == "COLOR")
+		{
+			ofLogNotice("Mixer") << "COLOR: " << e;
+			bChangedColor = true;
+		}
+	}
+
 	void update() {
-		//debug
+		////debug
 		//int it = 0;
 		//int ic = 0;
+		//ofLogNotice("TextureGroup") << "";
+
 		for (auto & t : texGroups) {//must add '&' to enable (read and) write too
 			for (auto c : channels) {
 				if (t.name == c->name && t.opacity > 0) c->update();
 
-				//ofLogNotice("TextureGroup") << "[" << ic << "] c: " << c->name;
+				//ofLogNotice("TextureGroup") << "c: [" << ic << "] " << c->name;
 				//ic++;
 			}
+			//ofLogNotice("TextureGroup") << "t: [" << it << "] " << t.name;
 
 			//to set blend mode gui name
 			if (t.blendMode != t.blendMode_PRE)
 			{
-				//ofLogNotice("TextureGroup") << "[" << it << "] t: "<< t.name;
-				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode_PRE: " << t.blendMode_PRE;
-				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode: " << t.blendMode;
 				t.blendMode_PRE = t.blendMode.get();
 				t.blendModeName = getNameFromBlendMode(t.blendMode);
+
+				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode_PRE: " << t.blendMode_PRE;
+				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode: " << t.blendMode;
 			}
 			//it++;
 		}
 
 		//to v flip
 		updateFbo();
-
-		//ofLogNotice("TextureGroup") << "";
 	}
 
 	void draw(int x, int y, int w, int h) {
@@ -199,7 +266,7 @@ public:
 		}
 		else
 		{
-			// ofTranslate(x,y);
+			//ofTranslate(x,y);
 			shader.begin();
 			{
 
@@ -232,13 +299,11 @@ public:
 
 	}
 
-
-
+	//--------------------------------------------------------------
 
 	void addChannel(ofFbo& fbo, string name, int blendMode) {
 		addChannel(fbo.getTexture(), name, blendMode);
 	}
-
 
 	void addChannel(ofTexture texture, string name, int blendMode) {
 		TextureGroup texGroup = TextureGroup(name, blendMode, texture);
@@ -265,7 +330,7 @@ public:
 		channels.push_back(&channel);
 	}
 
-
+	//--------------------------------------------------------------
 
 	ofParameterGroup& getParameterGroup() { return parameterGroup; }
 
@@ -279,7 +344,10 @@ public:
 		return paramSubGroups;
 	}
 
+	//--------------------------------------------------------------
+
 private:
+
 	vector <TextureGroup> texGroups;
 	ofShader shader;
 	ofShader shaderSingleChannel;
@@ -330,8 +398,6 @@ private:
 		shaderSingleChannel.linkProgram();
 	}
 
-	//WORKAROUND: ineficient but avoids the calback crashes.
-	//works on every frame...
 	//--------------------------------------------------------------
 	std::string getNameFromBlendMode(int blendMode)
 	{
@@ -395,7 +461,7 @@ private:
 	}
 
 
-	//WORKAROUND: to flip drawing easy
+	//WORKAROUND: to v flip drawing easy
 
 	//--------------------------------------------------------------
 	void setupFbo()
@@ -423,6 +489,8 @@ private:
 		//ofClearAlpha();//
 		fboMix.end();
 	}
+
+	//--
 
 public:
 
