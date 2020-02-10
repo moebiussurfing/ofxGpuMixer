@@ -71,7 +71,6 @@ public:
 	//API
 
 	//methods to control object by external gui or by code
-
 	//easy callback to update gui when params change
 
 private:
