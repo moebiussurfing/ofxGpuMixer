@@ -220,7 +220,12 @@ public:
 			if (t.blendMode != t.blendMode_PRE)
 			{
 				t.blendMode_PRE = t.blendMode.get();
-				t.blendModeName = getNameFromBlendMode(t.blendMode);
+				//t.blendModeName = getNameFromBlendMode(t.blendMode);
+
+				//delete "BLEND_"
+				string message = ofToUpper(getNameFromBlendMode(t.blendMode));
+				ofStringReplace(message, "BLEND_", "");
+				t.blendModeName = message;
 
 				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode_PRE: " << t.blendMode_PRE;
 				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode: " << t.blendMode;
