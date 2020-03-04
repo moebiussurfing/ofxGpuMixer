@@ -122,6 +122,10 @@ public:
 			return ofColor::black;
 		}
 	}
+	void setColorChannel0(ofColor c)
+	{
+		(channels[0]->parameterGroup.getColor("COLOR")) = c;
+	}
 
 	void setSolo(bool b)
 	{

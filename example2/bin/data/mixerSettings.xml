@@ -1,38 +1,38 @@
 <?xml version="1.0"?>
 <mixerSettings>
-	<Mixer>
-		<Preview>
-			<doPreview>0</doPreview>
-			<channelSelect>2</channelSelect>
-		</Preview>
+	<MIXER>
+		<PREVIEW>
+			<SOLO>0</SOLO>
+			<CHANNEL>0</CHANNEL>
+		</PREVIEW>
 		<Background>
-			<BasicColor>66, 39, 79, 255</BasicColor>
-			<Opacity>1</Opacity>
+			<COLOR>255, 0, 0, 255</COLOR>
+			<OPACITY>1</OPACITY>
 		</Background>
 		<A>
-			<Tint>
-				<Hue>0.682424</Hue>
-				<Saturation>1</Saturation>
-				<Brightness>0.250312</Brightness>
-				<TintAmt>0.427322</TintAmt>
-			</Tint>
-			<Contrast>1.31633</Contrast>
-			<Gain>3.89796</Gain>
-			<Opacity>0.510204</Opacity>
-			<blendMode>5</blendMode>
+			<TINT>
+				<HUE>0.5</HUE>
+				<SATURATION>1</SATURATION>
+				<BRIGHTNESS>1</BRIGHTNESS>
+				<TINT_AMOUNT>0</TINT_AMOUNT>
+			</TINT>
+			<CONTRAST>1</CONTRAST>
+			<GAIN>1</GAIN>
+			<OPACITY>1</OPACITY>
+			<BLEND_MODE>1</BLEND_MODE>
 		</A>
 		<B>
-			<Tint>
-				<Hue>0.135777</Hue>
-				<Saturation>0.271137</Saturation>
-				<Brightness>0.557476</Brightness>
-				<TintAmt>0.838609</TintAmt>
-			</Tint>
-			<Contrast>0.857143</Contrast>
-			<Gain>3.63265</Gain>
-			<Opacity>0.647959</Opacity>
-			<blendMode>7</blendMode>
+			<TINT>
+				<HUE>0.5</HUE>
+				<SATURATION>1</SATURATION>
+				<BRIGHTNESS>1</BRIGHTNESS>
+				<TINT_AMOUNT>0</TINT_AMOUNT>
+			</TINT>
+			<CONTRAST>1</CONTRAST>
+			<GAIN>1</GAIN>
+			<OPACITY>1</OPACITY>
+			<BLEND_MODE>1</BLEND_MODE>
 		</B>
-	</Mixer>
+	</MIXER>
 	<Background>255, 0, 0, 255</Background>
 </mixerSettings>
