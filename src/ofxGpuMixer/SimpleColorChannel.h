@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BasicChannel.h"
-#include "ofxAutoReloadedShader.h"
+//#include "ofxAutoReloadedShader.h"
 
 OFX_GPUMIXER_BEGIN_NAMESPACE
 
