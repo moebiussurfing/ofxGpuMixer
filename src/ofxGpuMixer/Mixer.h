@@ -51,7 +51,7 @@ public:
 };
 
 //--------------------------------------------------------------
-	
+
 class Mixer {
 
 public:
@@ -59,8 +59,9 @@ public:
 	vector<BasicChannel*> channels;
 	ofParameter<bool> doPreview{ "SOLO", false };
 	ofParameter<int> channelSelect{ "CHANNEL", 0, 0, 0 };
+	ofParameter<bool> bReset{ "RESET", false };
 
-	ofParameterGroup parameterPreview{ "PREVIEW", doPreview, channelSelect };
+	ofParameterGroup parameterPreview{ "PREVIEW", doPreview, channelSelect, bReset };
 
 	//--
 
@@ -77,7 +78,7 @@ private:
 
 	bool bGuiMustUpdate = false;
 	bool bChangedColor = false;
-	
+
 public:
 
 	bool isUpdated()
@@ -202,6 +203,37 @@ public:
 		{
 			ofLogNotice("Mixer") << "COLOR: " << e;
 			bChangedColor = true;
+		}
+		else if (name == "RESET")
+		{
+			ofLogNotice("Mixer") << "RESET: " << e;
+			if (bReset)
+			{
+				bReset = false;
+
+				//set black
+				(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
+				//(channels[0]->parameterGroup.getFloat("OPACITY")) = 0.5f;
+				texGroups[0].opacity = 1;
+
+				texGroups[1].hue = 0;
+				texGroups[1].saturation = 0;
+				texGroups[1].brightness = 0;
+				texGroups[1].tintAmt = 0;
+				texGroups[1].contrast = 0;
+				texGroups[1].gain = 1;
+				texGroups[1].opacity = 1;
+				texGroups[1].blendMode = 10;
+
+				texGroups[2].hue = 0;
+				texGroups[2].saturation = 0;
+				texGroups[2].brightness = 0;
+				texGroups[2].tintAmt = 0;
+				texGroups[2].contrast = 0;
+				texGroups[2].gain = 1;
+				texGroups[2].opacity = 1;
+				texGroups[2].blendMode = 10;
+			}
 		}
 	}
 
