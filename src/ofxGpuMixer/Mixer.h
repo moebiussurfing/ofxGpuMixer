@@ -211,11 +211,11 @@ public:
 			{
 				bReset = false;
 
-				//set black
+				//set bg black
 				(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
-				//(channels[0]->parameterGroup.getFloat("OPACITY")) = 0.5f;
 				texGroups[0].opacity = 1;
 
+				//ch1
 				texGroups[1].hue = 0;
 				texGroups[1].saturation = 0;
 				texGroups[1].brightness = 0;
@@ -225,6 +225,7 @@ public:
 				texGroups[1].opacity = 1;
 				texGroups[1].blendMode = 10;
 
+				//ch2
 				texGroups[2].hue = 0;
 				texGroups[2].saturation = 0;
 				texGroups[2].brightness = 0;
