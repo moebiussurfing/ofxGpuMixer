@@ -49,11 +49,11 @@ public:
 
 			if (name == "COLOR TINT")
 			{
-				//DISABLE_CALLBACKS = true;
-				//hue = colorTint.get().getHue();
-				//saturation = colorTint.get().getSaturation();
-				//brightness = colorTint.get().getBrightness();
-				//DISABLE_CALLBACKS = false;
+                DISABLE_CALLBACKS = true;
+                hue = colorTint.get().getHue()/ 255.f;
+                saturation = colorTint.get().getSaturation()/ 255.f;
+                brightness = colorTint.get().getBrightness()/ 255.f;
+                DISABLE_CALLBACKS = false;
 			}
 			else if (name == "HUE")
 			{
@@ -61,10 +61,30 @@ public:
 				ofColor cTemp = colorTint.get();
 				cTemp.setHue(hue.get()*255);
 				colorTint = cTemp;
-				//saturation = colorTint.get().getSaturation();
-				//brightness = colorTint.get().getBrightness();
+                saturation = colorTint.get().getSaturation() / 255.f;
+                brightness = colorTint.get().getBrightness() / 255.f;
 				DISABLE_CALLBACKS = false;
 			}
+            else if (name == "BRIGHTNESS")
+            {
+                DISABLE_CALLBACKS = true;
+                ofColor cTemp = colorTint.get();
+                cTemp.setBrightness(brightness.get()*255);
+                colorTint = cTemp;
+                hue = colorTint.get().getHue() / 255.f;
+                saturation = colorTint.get().getSaturation() / 255.f;
+                DISABLE_CALLBACKS = false;
+            }
+            else if (name == "SATURATION")
+            {
+                DISABLE_CALLBACKS = true;
+                ofColor cTemp = colorTint.get();
+                cTemp.setSaturation(saturation.get()*255);
+                colorTint = cTemp;
+                hue = colorTint.get().getHue() / 255.f;
+                brightness = colorTint.get().getBrightness() / 255.f;
+                DISABLE_CALLBACKS = false;
+            }
 		}
 	}
 
@@ -230,8 +250,9 @@ public:
 				texGroups[2].opacity = 1;
 				texGroups[2].blendMode = 10;
 
+                //TODO:
 				//NOTE: this is for my custom/typical mixer configuration/features: 
-				//background layer + 2 channels 
+				//background color layer + 2 channels
 			}
 		}
 	}
