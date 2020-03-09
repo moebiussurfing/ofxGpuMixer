@@ -1,57 +1,59 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup(){
-
+void ofApp::setup()
+{
     ofSetFrameRate(25);
     ofSetVerticalSync(false);
 
-    colorBackground.set("Background", ofColor(255,0,0), ofColor(0), ofColor(255));
+	//-
 
-    fboA.allocate(ofGetWidth(),ofGetHeight());
-    fboB.allocate(ofGetWidth(),ofGetHeight());
-    texB = fboB.getTexture(); // adding a texture insted of a fbo
+	//prepare channels
+
+	//channel 0
+    colorBackground.set("Background", ofColor(255,0,0), ofColor(0), ofColor(255));
     colorChannel.setup(colorBackground.getName(), colorBackground.get(), ofGetWidth(),ofGetHeight());
 
+	//channel 1
+    fboA.allocate(ofGetWidth(),ofGetHeight());
+    
+	//channel 2
+	fboB.allocate(ofGetWidth(),ofGetHeight());
+    texB = fboB.getTexture(); // adding a texture insted of a fbo
+
+	//mixer
     mixer.addChannel(colorChannel, ofxGpuMixer::BLEND_ADD);
-    mixer.addChannel(fboA,"A", ofxGpuMixer::BLEND_ADD);
-    mixer.addChannel(texB,"B", ofxGpuMixer::BLEND_ADD);
+    mixer.addChannel(fboA,"A ch1", ofxGpuMixer::BLEND_ADD);
+    mixer.addChannel(texB,"B ch2", ofxGpuMixer::BLEND_ADD);
 
     mixer.setup(); // Creates the shader in order to mix.
     
+	//-
     
-    // GUI
+    //gui
     gui.setup( mixer.getParameterGroup() );
-
-
+	
     //settings
-    params_mixerSettings.add(mixer.getParameterGroup());
     params_mixerSettings.add(colorBackground);
+    params_mixerSettings.add(mixer.getParameterGroup());
+	//load
     loadParams(params_mixerSettings, path_mixerSettings);
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
-    int s = ofGetHeight()/3;
+void ofApp::update()
+{
     fboA.begin();
     {
-        ofBackground(0,255);
-
-        ofSetColor(255);
-        //ofDrawRectangle(ofGetWidth()/2-s-100, ofGetHeight()/2-s, s*2, s*2);
-
+        ofClear(0,255);
         scene.drawChannel1();
     }
     fboA.end();
     
     fboB.begin();
     {
-        ofBackground(0,0,0);
-
-        ofSetColor(255);
-        //ofDrawCircle(ofGetWidth()/2, ofGetHeight()/2, s);
-
-        scene.drawChannel2();
+		ofClear(0, 255);
+		scene.drawChannel2();
     }
     fboB.end();
     
@@ -59,26 +61,25 @@ void ofApp::update(){
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw()
+{
     ofBackground(0);
-    ofSetColor(255);
-
-	////raw draw
- //   mixer.draw(0,0,ofGetWidth(), ofGetHeight());
+    //ofSetColor(255);
     
-	//fliped draw
 	mixer.drawFbo(0, 0, ofGetWidth(), ofGetHeight());
 
     gui.draw();
 }
 
 //--------------------------------------------------------------
-void ofApp::exit(){
+void ofApp::exit()
+{
     saveParams(params_mixerSettings, path_mixerSettings);
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::keyPressed(int key)
+{
     //scene
     if (key == 's')
     {
@@ -145,7 +146,6 @@ void ofApp::gotMessage(ofMessage msg){
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }
-
 
 //--------------------------------------------------------------
 void ofApp::loadParams(ofParameterGroup &g, string path)

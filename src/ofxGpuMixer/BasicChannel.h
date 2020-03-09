@@ -7,15 +7,13 @@ public:
     ofFbo fbo;
     ofParameterGroup parameterGroup;
     string name;
-
-    
+	    
     BasicChannel(){};
     
     virtual void setup(){};
-    
     virtual void update(){};
+    
     virtual void setupParameterGroup(string name){}
-
     
     void draw(){
         fbo.draw(0,0);
@@ -31,7 +29,6 @@ public:
     ofFbo& getFbo(){ return fbo; }
     ofParameterGroup& getParameterGroup(){ return parameterGroup; }
     string& getName(){ return name; }
-    
     
 private:
     

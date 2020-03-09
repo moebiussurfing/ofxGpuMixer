@@ -6,17 +6,18 @@
 OFX_GPUMIXER_BEGIN_NAMESPACE
 
 
-class SimpleColorChannel: public BasicChannel{
+//--------------------------------------------------------------
+class SimpleColorChannel: public BasicChannel
+{
 public:
-    
-
 
     ofParameter<ofColor> color;
     
     SimpleColorChannel(){}
     
-    
-    void setup(string channelName, ofColor color, int width, int height){
+	//--------------------------------------------------------------
+	void setup(string channelName, ofColor color, int width, int height)
+	{
         this->name = channelName;
         
         fbo.allocate(width, height, GL_RGBA32F_ARB);
@@ -27,11 +28,11 @@ public:
         fbo.end();
         
         setupParameterGroup(name, color);
-    }
+    } 
     
-   
-    
-    void update(){
+	//--------------------------------------------------------------
+	void update()
+	{
         fbo.begin();
         {
             glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -41,7 +42,9 @@ public:
         fbo.end();
     }
     
-    void setupParameterGroup(string name, ofColor color){
+	//--------------------------------------------------------------
+	void setupParameterGroup(string name, ofColor color)
+	{
             parameterGroup.add(this->color.set("COLOR", color, ofColor::black, ofColor::white));
     }
     
