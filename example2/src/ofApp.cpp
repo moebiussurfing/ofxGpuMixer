@@ -8,7 +8,7 @@ void ofApp::setup()
 
 	//-
 
-	//prepare channels
+	//1. prepare channels
 
 	//channel 0
     colorBackground.set("Background", ofColor(255,0,0), ofColor(0), ofColor(255));
@@ -19,14 +19,19 @@ void ofApp::setup()
     
 	//channel 2
 	fboB.allocate(ofGetWidth(),ofGetHeight());
-    texB = fboB.getTexture(); // adding a texture insted of a fbo
+    //texB = fboB.getTexture();//adding a texture insted of a fbo
 
-	//mixer
+	//-
+
+	//2. configure mixer
     mixer.addChannel(colorChannel, ofxGpuMixer::BLEND_ADD);
     mixer.addChannel(fboA,"A ch1", ofxGpuMixer::BLEND_ADD);
     mixer.addChannel(texB,"B ch2", ofxGpuMixer::BLEND_ADD);
 
-    mixer.setup(); // Creates the shader in order to mix.
+	//-
+
+	//3. startup mixer & creates the shader in order to mix.
+    mixer.setup(); 
     
 	//-
     
@@ -36,6 +41,7 @@ void ofApp::setup()
     //settings
     params_mixerSettings.add(colorBackground);
     params_mixerSettings.add(mixer.getParameterGroup());
+
 	//load
     loadParams(params_mixerSettings, path_mixerSettings);
 }

@@ -1,5 +1,8 @@
 #pragma once
 
+//TODO:
+//+ split groups gui to allow minimize / workflow
+
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "ofxGpuMixer.h"

@@ -28,9 +28,17 @@ public:
 	ofParameterGroup parametersTint{ "TINT", colorTint, hue, saturation, brightness, tintAmt };
 	ofParameterGroup parametersBlend{ "BLEND", contrast, gain, opacity, blendMode, blendModeName };
 	ofParameterGroup parameters{ "CHANNEL", parametersTint, parametersBlend };//both groups nested
-	
-	bool DISABLE_CALLBACKS = false;
 
+	//TODO:
+	bool DISABLE_CALLBACKS = false;
+	//--------------------------------------------------------------
+	void setup()
+	{
+		//callback
+		ofAddListener(parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
+	}
+
+	//--------------------------------------------------------------
 	void Changed_params(ofAbstractParameter &e)
 	{
 		if (!DISABLE_CALLBACKS)
@@ -39,30 +47,31 @@ public:
 
 			ofLogNotice("TextureGroup") << "Changed_params: " << name << " : " << e;
 
-			//if (name == "COLOR TINT")
-			//{
-			//	DISABLE_CALLBACKS = true;
-			//	hue = colorTint.get().getHue();
-			//	saturation = colorTint.get().getSaturation();
-			//	brightness = colorTint.get().getBrightness();
-			//	DISABLE_CALLBACKS = false;
-			//}
-			//else if (name == "HUE")
-			//{
-			//	//DISABLE_CALLBACKS = true;
-			//	//ofColor cTemp = colorTint.get();
-			//	//cTemp.setHue(hue.get());
-			//	//colorTint = cTemp;
-			//	//saturation = colorTint.get().getSaturation();
-			//	//brightness = colorTint.get().getBrightness();
-			//	//DISABLE_CALLBACKS = false;
-			//}
+			if (name == "COLOR TINT")
+			{
+				//DISABLE_CALLBACKS = true;
+				//hue = colorTint.get().getHue();
+				//saturation = colorTint.get().getSaturation();
+				//brightness = colorTint.get().getBrightness();
+				//DISABLE_CALLBACKS = false;
+			}
+			else if (name == "HUE")
+			{
+				DISABLE_CALLBACKS = true;
+				ofColor cTemp = colorTint.get();
+				cTemp.setHue(hue.get()*255);
+				colorTint = cTemp;
+				//saturation = colorTint.get().getSaturation();
+				//brightness = colorTint.get().getBrightness();
+				DISABLE_CALLBACKS = false;
+			}
 		}
 	}
 
 	string name;
 	ofTexture texture;
 
+	//--------------------------------------------------------------
 	TextureGroup(string name, int blendMode, ofTexture texture)
 	{
 		parameters.setName(name);
@@ -72,10 +81,11 @@ public:
 		this->blendModeName.setSerializable(false);//to not include into xml settings
 		this->blendMode_PRE = -1;
 
-		//callback
-		ofAddListener(parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
+		////callback
+		//ofAddListener(parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
 	}
 
+	//--------------------------------------------------------------
 	void parametersWithoutBlendMode()
 	{
 		parameters.clear();
@@ -85,8 +95,8 @@ public:
 		parameters.add(gain);
 		parameters.add(opacity);
 
-		//callback
-		ofAddListener(parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
+		////callback
+		//ofAddListener(parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
 	}
 };
 
@@ -103,7 +113,7 @@ public:
 	ofParameter<bool> bReset{ "RESET", false };
 
 	ofParameterGroup parameterPreview{ "PREVIEW", doPreview, channelSelect, bReset };
-	
+
 	//-
 
 	////TODO:
@@ -142,7 +152,6 @@ public:
 	//to v flip
 	ofFbo fboMix;
 
-	//--------------------------------------------------------------
 
 	//--------------------------------------------------------------
 	void setup()
@@ -161,6 +170,7 @@ public:
 			parameterGroup.add(texGroups[i].parameters);
 
 			//callback
+			texGroups[i].setup();
 			//ofAddListener(texGroups[i].parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
 		}
 
@@ -227,7 +237,7 @@ public:
 	}
 
 	//--------------------------------------------------------------
-	void update() 
+	void update()
 	{
 		////debug
 		//int it = 0;
