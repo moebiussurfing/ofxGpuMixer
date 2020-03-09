@@ -18,16 +18,18 @@ public:
 	ofParameter<float> saturation{ "SATURATION",1, 0, 1. };
 	ofParameter<float> brightness{ "BRIGHTNESS",1, 0, 1. };
 	ofParameter<float> tintAmt{ "TINT AMOUNT", 0, 0., 1 };
-	ofParameter<float> contrast{ "CONTRAST", 1., 0., 2. };
-	ofParameter<float> gain{ "GAIN", 1.0, 1., 5. };
-	ofParameter<float> opacity{ "OPACITY", 1., 0., 1. };
-	ofParameter<int> blendMode{ "BLEND MODE", 1, 1, PASS_THROUGH };
+
+    ofParameter<int> blendMode{ "BLEND MODE", 1, 1, PASS_THROUGH };
 	ofParameter<string> blendModeName{ "", "" };//to set blend mode gui name
 	int blendMode_PRE;//to avoid use of callback that crashes..
+    ofParameter<float> contrast{ "CONTRAST", 1., 0., 2. };
+    ofParameter<float> gain{ "GAIN", 1.0, 1., 5. };
+    ofParameter<float> opacity{ "OPACITY", 1., 0., 1. };
 
-	ofParameterGroup parametersTint{ "TINT", colorTint, hue, saturation, brightness, tintAmt };
-	ofParameterGroup parametersBlend{ "BLEND", contrast, gain, opacity, blendMode, blendModeName };
-	ofParameterGroup parameters{ "CHANNEL", parametersTint, parametersBlend };//both groups nested
+    ofParameterGroup parametersBlend{ "BLEND", blendModeName, blendMode, opacity, gain, contrast  };
+    ofParameterGroup parametersTint{ "TINT", colorTint, hue, saturation, brightness, tintAmt };
+
+    ofParameterGroup parameters{ "CHANNEL", parametersBlend, parametersTint };//both groups nested
 
 	//TODO:
 	bool DISABLE_CALLBACKS = false;
@@ -100,9 +102,6 @@ public:
 		this->texture = texture;
 		this->blendModeName.setSerializable(false);//to not include into xml settings
 		this->blendMode_PRE = -1;
-
-		////callback
-		//ofAddListener(parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
 	}
 
 	//--------------------------------------------------------------
@@ -114,9 +113,6 @@ public:
 		parameters.add(contrast);
 		parameters.add(gain);
 		parameters.add(opacity);
-
-		////callback
-		//ofAddListener(parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
 	}
 };
 
@@ -133,39 +129,6 @@ public:
 	ofParameter<bool> bReset{ "RESET", false };
 
 	ofParameterGroup parameterPreview{ "PREVIEW", doPreview, channelSelect, bReset };
-
-	//-
-
-	////TODO:
-	//bool DISABLE_CALLBACKS = false;
-	//void Changed_params(ofAbstractParameter &e)
-	//{
-	//	if (!DISABLE_CALLBACKS)
-	//	{
-	//		string name = e.getName();
-
-	//		ofLogNotice("TextureGroup") << "Changed_params: " << name << " : " << e;
-
-	//		if (name == "COLOR TINT")
-	//		{
-	//			DISABLE_CALLBACKS = true;
-	//			hue = colorTint.get().getHue();
-	//			saturation = colorTint.get().getSaturation();
-	//			brightness = colorTint.get().getBrightness();
-	//			DISABLE_CALLBACKS = false;
-	//		}
-	//		else if (name == "HUE")
-	//		{
-	//			//DISABLE_CALLBACKS = true;
-	//			//ofColor cTemp = colorTint.get();
-	//			//cTemp.setHue(hue.get());
-	//			//colorTint = cTemp;
-	//			//saturation = colorTint.get().getSaturation();
-	//			//brightness = colorTint.get().getBrightness();
-	//			//DISABLE_CALLBACKS = false;
-	//		}
-	//	}
-	//}
 
 	//--
 
@@ -191,7 +154,6 @@ public:
 
 			//callback
 			texGroups[i].setup();
-			//ofAddListener(texGroups[i].parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
 		}
 
 		//callback
@@ -230,6 +192,8 @@ public:
 				(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
 				texGroups[0].opacity = 1;
 
+                //TODO:
+                //add reset method into inside class
 				//ch1
 				texGroups[1].hue = 0;
 				texGroups[1].saturation = 0;

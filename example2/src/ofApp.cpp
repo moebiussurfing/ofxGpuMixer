@@ -11,7 +11,7 @@ void ofApp::setup()
 	//1. prepare channels
 
 	//channel 0
-    colorBackground.set("Background", ofColor(255,0,0), ofColor(0), ofColor(255));
+    colorBackground.set("CH0 BG", ofColor(0), ofColor(0), ofColor(255));
     colorChannel.setup(colorBackground.getName(), colorBackground.get(), ofGetWidth(),ofGetHeight());
 
 	//channel 1
@@ -25,8 +25,8 @@ void ofApp::setup()
 
 	//2. configure mixer
     mixer.addChannel(colorChannel, ofxGpuMixer::BLEND_ADD);
-    mixer.addChannel(fboA,"A ch1", ofxGpuMixer::BLEND_ADD);
-    mixer.addChannel(texB,"B ch2", ofxGpuMixer::BLEND_ADD);
+    mixer.addChannel(fboA,"CH1", ofxGpuMixer::BLEND_ADD);
+    mixer.addChannel(texB,"CH2", ofxGpuMixer::BLEND_ADD);
 
 	//-
 
@@ -43,7 +43,9 @@ void ofApp::setup()
     params_mixerSettings.add(mixer.getParameterGroup());
 
 	//load
-    loadParams(params_mixerSettings, path_mixerSettings);
+    //TODO:
+    //crashes
+//    loadParams(params_mixerSettings, path_mixerSettings);
 }
 
 //--------------------------------------------------------------
@@ -51,7 +53,7 @@ void ofApp::update()
 {
     fboA.begin();
     {
-        ofClear(0,255);
+        ofClear(0, 255);
         scene.drawChannel1();
     }
     fboA.end();
@@ -70,9 +72,9 @@ void ofApp::update()
 void ofApp::draw()
 {
     ofBackground(0);
-    //ofSetColor(255);
     
-	mixer.drawFbo(0, 0, ofGetWidth(), ofGetHeight());
+    mixer.drawFbo(0, 0, ofGetWidth(), ofGetHeight());//to v flip
+//    mixer.draw(0, 0, ofGetWidth(), ofGetHeight());
 
     gui.draw();
 }
