@@ -19,7 +19,7 @@ void ofApp::setup()
     
 	//channel 2
 	fboB.allocate(ofGetWidth(),ofGetHeight());
-    //texB = fboB.getTexture();//adding a texture insted of a fbo
+    texB = fboB.getTexture();//adding a texture insted of a fbo
 
 	//-
 
