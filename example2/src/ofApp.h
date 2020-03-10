@@ -12,6 +12,8 @@
 class ofApp : public ofBaseApp{
     
 public:
+    void refreshGui_Mixer();
+
     void setup();
     void update();
     void draw();
