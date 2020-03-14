@@ -11,7 +11,7 @@ void ofApp::setup()
 	//1. prepare channels
 
 	//channel 0
-	colorBackground.set("BACKGROUND", ofColor(0, 0, 0, 0), ofColor(0, 0, 0, 0), ofColor(255, 255, 255, 255));
+	colorBackground.set("BACKGROUND", ofColor(0, 0, 0), ofColor(0, 0, 0), ofColor(255, 255, 255));
 	colorChannel.setup(colorBackground.getName(), colorBackground.get(), ofGetWidth(), ofGetHeight());
 
 	//channel 1
