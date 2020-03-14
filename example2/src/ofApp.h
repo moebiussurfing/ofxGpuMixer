@@ -12,7 +12,6 @@
 class ofApp : public ofBaseApp{
     
 public:
-    void refreshGui_Mixer();
 
     void setup();
     void update();
@@ -33,23 +32,29 @@ public:
     void gotMessage(ofMessage msg);
     
     ofxPanel gui;
+
+	//-
     
     ofxGpuMixer::Mixer mixer;
-    
+    ofxGpuMixer::SimpleColorChannel colorChannel;
+
     ofFbo fboA;
     ofFbo fboB;
-    ofTexture texB;
+    //ofTexture texB;
     
-    ofxGpuMixer::SimpleColorChannel colorChannel;
+    void refreshGui_Mixer();
+        
+    ofParameter<ofColor> colorBackground;
     
     //-
     
-    ofxSceneTEST scene;
-    
     void loadParams(ofParameterGroup &g, string path);
     void saveParams(ofParameterGroup &g, string path);
-    
-    ofParameter<ofColor> colorBackground;
+
     ofParameterGroup params_mixerSettings{"mixerSettings"};
     string path_mixerSettings = "mixerSettings.xml";
+    
+	//-
+
+    ofxSceneTEST scene;
 };

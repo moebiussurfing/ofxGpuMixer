@@ -1,6 +1,10 @@
 #pragma once
 
+//#include "ofMain.h"
+//#include "ofEvents.h"  
+
 #define STRINGIFY(x) #x
+
 #include "MixingShaderSnipets.h"
 #include "SimpleColorChannel.h"
 #include "Constants.h"
@@ -9,35 +13,80 @@ OFX_GPUMIXER_BEGIN_NAMESPACE
 
 //--------------------------------------------------------------
 
-class TextureGroup
+class TextureGroup //: public ofBaseApp
 {
+
 public:
 
-	ofParameter<ofColor> colorTint{ "COLOR TINT", ofColor(0), ofColor(0), ofColor(255) };
-	ofParameter<float> hue{ "HUE", 0.5, 0, 1. };
-	ofParameter<float> saturation{ "SATURATION",1, 0, 1. };
-	ofParameter<float> brightness{ "BRIGHTNESS",1, 0, 1. };
-	ofParameter<float> tintAmt{ "TINT AMOUNT", 0, 0., 1 };
+	//private:
+	//ofEventListeners listener2;
 
-    ofParameter<int> blendMode{ "BLEND MODE", 1, 1, PASS_THROUGH };
+	ofParameterGroup parametersBlend;
+	ofParameterGroup parametersTint;
+	ofParameterGroup parameters;
+
+	//TextureGroup()
+	//{
+	//	parametersBlend.setName("BLEND");
+	//	parametersTint.setName("TINT");
+	//	parameters.setName("CHANNEL");
+	//	parametersBlend.add(blendModeName, blendMode, opacity, gain, contrast);
+	//	parametersTint.add(colorTint, hue, saturation, brightness, tintAmt);
+	//	parameters.add(parametersBlend, parametersTint);//both groups nested
+	//};
+
+	ofParameter<ofColor> colorTint{ "COLOR TINT", ofColor(0,0,0), ofColor(0,0,0), ofColor(255,255,255) };
+	ofParameter<float> hue{ "HUE", 0.5f, 0.f, 1.f };
+	ofParameter<float> saturation{ "SATURATION", 1.f, 0.f, 1.f };
+	ofParameter<float> brightness{ "BRIGHTNESS", 1.f, 0.f, 1.f };
+	ofParameter<float> tintAmt{ "TINT AMOUNT", 0.f, 0.f, 1.f };
+
 	ofParameter<string> blendModeName{ "", "" };//to set blend mode gui name
-	int blendMode_PRE;//to avoid use of callback that crashes..
-    ofParameter<float> contrast{ "CONTRAST", 1., 0., 2. };
-    ofParameter<float> gain{ "GAIN", 1.0, 1., 5. };
-    ofParameter<float> opacity{ "OPACITY", 1., 0., 1. };
+	ofParameter<int> blendMode{ "BLEND MODE", 1, 1, PASS_THROUGH };
+	ofParameter<float> contrast{ "CONTRAST", 1.f, 0.f, 2.f };
+	ofParameter<float> gain{ "GAIN", 1.f, 1.f, 5.f };
+	ofParameter<float> opacity{ "OPACITY", 1.f, 0.f, 1.f };
 
-    ofParameterGroup parametersBlend{ "BLEND", blendModeName, blendMode, opacity, gain, contrast  };
-    ofParameterGroup parametersTint{ "TINT", colorTint, hue, saturation, brightness, tintAmt };
+	//ofParameterGroup parametersBlend{ "BLEND", blendModeName, blendMode, opacity, gain, contrast };
+	//ofParameterGroup parametersTint{ "TINT", colorTint, hue, saturation, brightness, tintAmt };
+	//ofParameterGroup parameters{ "CHANNEL", parametersBlend, parametersTint };//both groups nested
 
-    ofParameterGroup parameters{ "CHANNEL", parametersBlend, parametersTint };//both groups nested
+	int blendMode_PRE;//TODO: to avoid use of callback that crashes..
 
-	//TODO:
 	bool DISABLE_CALLBACKS = false;
+
+	string name;
+	ofTexture texture;
+
+	//-
+
 	//--------------------------------------------------------------
 	void setup()
 	{
+		parametersBlend.setName("BLEND");
+		parametersTint.setName("TINT");
+		//parameters.setName("CHANNEL");
+
+		parametersBlend.add(blendModeName, blendMode, opacity, gain, contrast);
+		parametersTint.add(colorTint, hue, saturation, brightness, tintAmt);
+		parameters.add(parametersBlend, parametersTint);//both groups nested
+
+		//-
+
 		//callback
 		ofAddListener(parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
+
+		//TODO:
+		//workaround to simplify and avoid calback crashes..
+		//listener = parametersTint.parameterChangedE().newListener(
+		//	[&](ofAbstractParameter&p) 
+		//{
+		//	auto v = p.cast<float>().get();
+		//	//auto str = ofToString(v);
+		//	//groupStrings.getString(p.getName()).set(str);
+		//	//cout << "listener: v:" << v << endl;
+		//}
+		//);
 	}
 
 	//--------------------------------------------------------------
@@ -47,51 +96,49 @@ public:
 		{
 			string name = e.getName();
 
-			ofLogNotice("TextureGroup") << "Changed_params: " << name << " : " << e;
+			if (name != "")
+				ofLogNotice("TextureGroup") << "Changed_params: " << name << ": " << e;
 
 			if (name == "COLOR TINT")
 			{
-                DISABLE_CALLBACKS = true;
-                hue = colorTint.get().getHue()/ 255.f;
-                saturation = colorTint.get().getSaturation()/ 255.f;
-                brightness = colorTint.get().getBrightness()/ 255.f;
-                DISABLE_CALLBACKS = false;
+				DISABLE_CALLBACKS = true;
+				this->hue = (colorTint.get().getHue() / 255.f);
+				this->saturation = colorTint.get().getSaturation() / 255.f;
+				this->brightness = colorTint.get().getBrightness() / 255.f;
+				DISABLE_CALLBACKS = false;
 			}
 			else if (name == "HUE")
 			{
 				DISABLE_CALLBACKS = true;
 				ofColor cTemp = colorTint.get();
-				cTemp.setHue(hue.get()*255);
+				cTemp.setHue(hue.get() * 255);
 				colorTint = cTemp;
-                saturation = colorTint.get().getSaturation() / 255.f;
-                brightness = colorTint.get().getBrightness() / 255.f;
+				saturation = colorTint.get().getSaturation() / 255.f;
+				brightness = colorTint.get().getBrightness() / 255.f;
 				DISABLE_CALLBACKS = false;
 			}
-            else if (name == "BRIGHTNESS")
-            {
-                DISABLE_CALLBACKS = true;
-                ofColor cTemp = colorTint.get();
-                cTemp.setBrightness(brightness.get()*255);
-                colorTint = cTemp;
-                hue = colorTint.get().getHue() / 255.f;
-                saturation = colorTint.get().getSaturation() / 255.f;
-                DISABLE_CALLBACKS = false;
-            }
-            else if (name == "SATURATION")
-            {
-                DISABLE_CALLBACKS = true;
-                ofColor cTemp = colorTint.get();
-                cTemp.setSaturation(saturation.get()*255);
-                colorTint = cTemp;
-                hue = colorTint.get().getHue() / 255.f;
-                brightness = colorTint.get().getBrightness() / 255.f;
-                DISABLE_CALLBACKS = false;
-            }
+			else if (name == "BRIGHTNESS")
+			{
+				DISABLE_CALLBACKS = true;
+				ofColor cTemp = colorTint.get();
+				cTemp.setBrightness(brightness.get() * 255);
+				colorTint = cTemp;
+				hue = colorTint.get().getHue() / 255.f;
+				saturation = colorTint.get().getSaturation() / 255.f;
+				DISABLE_CALLBACKS = false;
+			}
+			else if (name == "SATURATION")
+			{
+				DISABLE_CALLBACKS = true;
+				ofColor cTemp = colorTint.get();
+				cTemp.setSaturation(saturation.get() * 255);
+				colorTint = cTemp;
+				hue = colorTint.get().getHue() / 255.f;
+				brightness = colorTint.get().getBrightness() / 255.f;
+				DISABLE_CALLBACKS = false;
+			}
 		}
 	}
-
-	string name;
-	ofTexture texture;
 
 	//--------------------------------------------------------------
 	TextureGroup(string name, int blendMode, ofTexture texture)
@@ -118,9 +165,22 @@ public:
 
 //--------------------------------------------------------------
 
-class Mixer {
+class Mixer// : public ofBaseApp
+{
 
 public:
+
+	//--
+
+	vector <TextureGroup> texGroups;
+	ofShader shader;
+	ofShader shaderSingleChannel;
+
+	ofParameterGroup parameterGroup;//all bundled mixer params 
+
+	bool isFirst = true;
+
+	//--
 
 	//control pannel
 	vector<BasicChannel*> channels;
@@ -135,6 +195,28 @@ public:
 	//to v flip
 	ofFbo fboMix;
 
+	bool DISABLE_CALLBACKS = false;
+
+	//--
+
+	//--------------------------------------------------------------
+	void reset()
+	{
+		for (int i = 0; i < texGroups.size(); i++)
+		{
+			//channel callback
+			if (i != 0)//TODO: custom mode with chgannel 0 as background+
+			{
+				texGroups[i].DISABLE_CALLBACKS = true;
+				texGroups[i].colorTint = ofColor(0);
+				texGroups[i].tintAmt = 0.f;
+				texGroups[i].hue = texGroups[i].colorTint.get().getHue() / 255.f;
+				texGroups[i].saturation = texGroups[i].colorTint.get().getSaturation() / 255.f;
+				texGroups[i].brightness = texGroups[i].colorTint.get().getBrightness() / 255.f;
+				texGroups[i].DISABLE_CALLBACKS = false;
+			}
+		}
+	}
 
 	//--------------------------------------------------------------
 	void setup()
@@ -150,15 +232,18 @@ public:
 
 		for (int i = 0; i < texGroups.size(); i++)
 		{
-			parameterGroup.add(texGroups[i].parameters);
+			//channel callback
+			if (i != 0)//TODO: custom mode with chgannel 0 as background
+				texGroups[i].setup();
 
-			//callback
-			texGroups[i].setup();
+			parameterGroup.add(texGroups[i].parameters);
 		}
 
-		//callback
+		//mixer callback
 		ofAddListener(parameterGroup.parameterChangedE(), this, &Mixer::Changed_params);
 		//remove listener is pending..
+
+		//-
 
 		//shader
 		generateShader();
@@ -166,57 +251,73 @@ public:
 
 		//to v flip
 		setupFbo();
+
+		//-
+
+		//TODO:
+		//this is a workaround to do a kind of refresh of gui/params to avoid crashes when we pick the color controls
+		//before hsb params changed..
+		//but must be called out of addon, maybe bc it's added to gui at ofApp?
+		//reset();
 	}
 
 	//--------------------------------------------------------------
 	void Changed_params(ofAbstractParameter &e)
 	{
-		string name = e.getName();
-
-		ofLogVerbose("Mixer") << "Changed_params: " << name << " : " << e;
-
-		if (name == "COLOR")
+		if (!DISABLE_CALLBACKS)
 		{
-			ofLogNotice("Mixer") << "COLOR: " << e;
-			bChangedColor = true;
-		}
-		else if (name == "RESET")
-		{
-			ofLogNotice("Mixer") << "RESET: " << e;
-			if (bReset)
+			string name = e.getName();
+
+			if (name != "")
+				ofLogVerbose("Mixer") << "Changed_params: " << name << ": " << e;
+
+			if (name == "COLOR")
 			{
-				bReset = false;
+				DISABLE_CALLBACKS = true;
+				ofLogNotice("Mixer") << "COLOR: " << e;
+				bChangedColor = true;
+				DISABLE_CALLBACKS = false;
+			}
+			else if (name == "RESET")
+			{
+				DISABLE_CALLBACKS = true;
+				ofLogNotice("Mixer") << "RESET: " << e;
+				if (bReset)
+				{
+					bReset = false;
 
-				//ch0
-				//set bg black
-				(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
-				texGroups[0].opacity = 1;
+					//ch0
+					//set bg black
+					(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
+					texGroups[0].opacity = 1;
 
-                //TODO:
-                //add reset method into inside class
-				//ch1
-				texGroups[1].hue = 0;
-				texGroups[1].saturation = 0;
-				texGroups[1].brightness = 0;
-				texGroups[1].tintAmt = 0;
-				texGroups[1].contrast = 0;
-				texGroups[1].gain = 1;
-				texGroups[1].opacity = 1;
-				texGroups[1].blendMode = 10;
+					//TODO:
+					//add reset method into inside class
+					//ch1
+					texGroups[1].hue = 0;
+					texGroups[1].saturation = 0;
+					texGroups[1].brightness = 0;
+					texGroups[1].tintAmt = 0;
+					texGroups[1].contrast = 0;
+					texGroups[1].gain = 1;
+					texGroups[1].opacity = 1;
+					texGroups[1].blendMode = 10;
 
-				//ch2
-				texGroups[2].hue = 0;
-				texGroups[2].saturation = 0;
-				texGroups[2].brightness = 0;
-				texGroups[2].tintAmt = 0;
-				texGroups[2].contrast = 0;
-				texGroups[2].gain = 1;
-				texGroups[2].opacity = 1;
-				texGroups[2].blendMode = 10;
+					//ch2
+					texGroups[2].hue = 0;
+					texGroups[2].saturation = 0;
+					texGroups[2].brightness = 0;
+					texGroups[2].tintAmt = 0;
+					texGroups[2].contrast = 0;
+					texGroups[2].gain = 1;
+					texGroups[2].opacity = 1;
+					texGroups[2].blendMode = 10;
 
-                //TODO:
-				//NOTE: this is for my custom/typical mixer configuration/features: 
-				//background color layer + 2 channels
+					//TODO:
+					////NOTE: this is for my custom/typical mixer configuration/features: 
+					////background color layer + 2 channels
+				}
+				DISABLE_CALLBACKS = false;
 			}
 		}
 	}
@@ -234,7 +335,10 @@ public:
 		{
 			for (auto c : channels)
 			{
-				if (t.name == c->name && t.opacity > 0) c->update();
+				if (t.name == c->name && t.opacity > 0)
+				{
+					c->update();
+				}
 
 				//ofLogNotice("TextureGroup") << "c: [" << ic << "] " << c->name;
 				//ic++;
@@ -248,7 +352,8 @@ public:
 				//t.blendModeName = getNameFromBlendMode(t.blendMode);
 
 				//delete "BLEND_"
-				string message = ofToUpper(getNameFromBlendMode(t.blendMode));
+				//string message = ofToUpper(getNameFromBlendMode(t.blendMode));
+				string message = getNameFromBlendMode(t.blendMode);
 				ofStringReplace(message, "BLEND_", "");
 				t.blendModeName = message;
 
@@ -300,8 +405,8 @@ public:
 				shader.setUniform2f("iResolution", w, h);
 				shader.setUniform1f("iGlobalTime", ofGetElapsedTimef()); //tempo p nr 1
 
-				for (int i = 0; i < texGroups.size(); i++) {
-
+				for (int i = 0; i < texGroups.size(); i++)
+				{
 					shader.setUniformTexture("tex" + ofToString(i), texGroups[i].texture, i);
 					shader.setUniform1f("u_H_" + ofToString(i), texGroups[i].hue);
 					shader.setUniform1f("u_S_" + ofToString(i), texGroups[i].saturation);
@@ -312,7 +417,6 @@ public:
 					shader.setUniform1f("u_opacity_" + ofToString(i), texGroups[i].opacity);
 					shader.setUniform1i("u_blendMode_" + ofToString(i), texGroups[i].blendMode);
 					shader.setUniform2f("resolution_" + ofToString(i), texGroups[i].texture.getWidth(), texGroups[i].texture.getHeight());
-
 				}
 
 				ofSetColor(255, 255, 255);
@@ -325,6 +429,9 @@ public:
 		ofPopMatrix();
 	}
 
+	//-
+
+	//add layers
 	//--------------------------------------------------------------
 	void addChannel(ofFbo& fbo, string name, int blendMode)
 	{
@@ -335,18 +442,13 @@ public:
 	void addChannel(ofTexture texture, string name, int blendMode)
 	{
 		TextureGroup texGroup = TextureGroup(name, blendMode, texture);
-		if (isFirst) {
+		if (isFirst)
+		{
 			texGroup.parametersWithoutBlendMode();
 			texGroup.blendMode = PASS_THROUGH;
 			isFirst = false;
 		}
 		texGroups.push_back(texGroup);
-
-		////callback
-		//int texLast = texGroups.size()-1;
-		//ofAddListener(texGroups[texLast].parameters.parameterChangedE(), 
-		//	this, 
-		//	&Mixer::TextureGroup::Changed_params);
 	}
 
 	//--------------------------------------------------------------
@@ -367,6 +469,9 @@ public:
 		channels.push_back(&channel);
 	}
 
+	//-
+
+	//params getters
 	//--------------------------------------------------------------
 	ofParameterGroup& getParameterGroup() { return parameterGroup; }
 
@@ -389,12 +494,12 @@ public:
 	//methods to control object by external gui or by code
 	//easy callback to update gui when params change
 
-private:
+//private:
 
 	bool bGuiMustUpdate = false;
 	bool bChangedColor = false;
 
-public:
+	//public:
 
 	bool isUpdated()
 	{
@@ -438,6 +543,7 @@ public:
 			return ofColor::black;
 		}
 	}
+
 	void setColorChannel0(ofColor c)
 	{
 		(channels[0]->parameterGroup.getColor("COLOR")) = c;
@@ -457,6 +563,7 @@ public:
 	{
 		return channelSelect.getMax();
 	}
+
 	void selectChannel(int _channel)
 	{
 		if (_channel <= channelSelect.getMax() && _channel >= 0)
@@ -486,33 +593,26 @@ public:
 
 	//--------------------------------------------------------------
 
-private:
+//private:
+//public:
 
-	vector <TextureGroup> texGroups;
-	ofShader shader;
-	ofShader shaderSingleChannel;
-
-	ofParameterGroup parameterGroup;//all bundled mixer params 
-	//TODO:
-	ofParameterGroup parametersTint;
-	ofParameterGroup parametersBlend;
-
-	bool isFirst = true;
-
+	//--------------------------------------------------------------
 	void generateShader()
 	{
 		//GENERATE THE SHADER
 		stringstream shaderScript;
 		shaderScript << "#version 120" << endl;
 		shaderScript << uniformsHeader;
-		for (int i = 0; i < texGroups.size(); i++) {
+		for (int i = 0; i < texGroups.size(); i++)
+		{
 			string snipet = uniforms;
 			ofStringReplace(snipet, "$0", ofToString(i));
 			shaderScript << snipet;
 		}
 		shaderScript << functions;
 		shaderScript << mainHeader;
-		for (int i = 0; i < texGroups.size(); i++) {
+		for (int i = 0; i < texGroups.size(); i++)
+		{
 			string snipet = channel;
 			ofStringReplace(snipet, "$0", ofToString(i));
 			shaderScript << snipet;
@@ -523,6 +623,7 @@ private:
 		shader.linkProgram();
 	}
 
+	//--------------------------------------------------------------
 	void generateShaderSingleChannel()
 	{
 		//GENERATE THE SHADER
@@ -605,6 +706,7 @@ private:
 		return s;
 	}
 
+	//--
 
 	//WORKAROUND: to v flip drawing easy
 
@@ -634,9 +736,13 @@ private:
 		fboMix.end();
 	}
 
-	//--
+	//--------------------------------------------------------------
+	void fboResize(int w, int h)
+	{
+		fboMix.allocate(w, h);
+	}
 
-public:
+	//public:
 
 	//--------------------------------------------------------------
 	void drawFbo()

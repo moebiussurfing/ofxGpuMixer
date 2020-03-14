@@ -5,7 +5,6 @@
 
 OFX_GPUMIXER_BEGIN_NAMESPACE
 
-
 //--------------------------------------------------------------
 class SimpleColorChannel: public BasicChannel
 {
