@@ -37,11 +37,18 @@ void ofApp::setup()
 	//-
 
 	//gui
-	gui.setup(mixer.getParameterGroup());
+	//gui.setup(mixer.getParameterGroup());
+
+	gui.setup("MIXER");
+	gui.add(mixer.getParameterGroupPreview());
+	gui.add(mixer.getParameterGroupChannel(0));
+	gui.add(mixer.getParameterGroupChannel(1));
+	gui.add(mixer.getParameterGroupChannel(2));
 
 	//settings
-	params_mixerSettings.add(colorBackground);
-	params_mixerSettings.add(mixer.getParameterGroup());
+	params_mixerSettings.add(colorBackground);//ch0 bg
+	params_mixerSettings.add(mixer.getParameterGroup());//all params together
+
 
 	//----
 

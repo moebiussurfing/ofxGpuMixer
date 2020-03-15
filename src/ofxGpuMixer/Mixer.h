@@ -131,7 +131,7 @@ public:
 			{
 				DISABLE_CALLBACKS = true;
 				ofColor cTemp = colorTint.get();
-				cTemp.setSaturation(saturation.get() * 255);
+				cTemp.setSaturation(saturation.get() * 255.f);
 				colorTint = cTemp;
 				hue = colorTint.get().getHue() / 255.f;
 				brightness = colorTint.get().getBrightness() / 255.f;
@@ -243,7 +243,7 @@ public:
 		ofAddListener(parameterGroup.parameterChangedE(), this, &Mixer::Changed_params);
 		//remove listener is pending..
 
-		//-
+		//--
 
 		//shader
 		generateShader();
@@ -252,7 +252,7 @@ public:
 		//to v flip
 		setupFbo();
 
-		//-
+		//--
 
 		//TODO:
 		//this is a workaround to do a kind of refresh of gui/params to avoid crashes when we pick the color controls
@@ -475,8 +475,25 @@ public:
 	//--------------------------------------------------------------
 	ofParameterGroup& getParameterGroup() { return parameterGroup; }
 
+	//separated panels to imrpove group folding
 	//--------------------------------------------------------------
-	vector<ofParameterGroup*> getVectorOfParameterSubgroups()
+	ofParameterGroup& getParameterGroupPreview() { return parameterPreview; }
+	
+	//--------------------------------------------------------------
+	ofParameterGroup& getParameterGroupChannel(int i)
+	{
+		if (i < texGroups.size())
+			return texGroups[i].parameters;
+		else
+		{
+			//TODO: not used but must return something..
+			ofLogError("Mixer") << "getParameterGroupChannel : channel out of range!";
+			return parameterPreview;
+		}
+	}
+
+	//--------------------------------------------------------------
+	vector<ofParameterGroup*> getVectorOfParameterSubgroups()//all layers grouped
 	{
 		vector<ofParameterGroup*> paramSubGroups;
 
