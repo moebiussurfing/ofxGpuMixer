@@ -188,7 +188,10 @@ public:
 	ofParameter<int> channelSelect{ "CHANNEL", 0, 0, 0 };
 	ofParameter<bool> bReset{ "RESET", false };
 
-	ofParameterGroup parameterPreview{ "PREVIEW", channelSelect, ENABLE_Solo, bReset };
+	ofParameterGroup parameterPreview{ "PREVIEW" };
+	//ofParameterGroup parameterPreview{ "PREVIEW", channelSelect, ENABLE_Solo, bReset };
+
+	vector <ofParameter<bool>> bCh;
 
 	//ofParameter<bool> bCh0{ "CH0", false };
 	//ofParameter<bool> bCh1{ "CH1", false };
@@ -225,14 +228,34 @@ public:
 	//--------------------------------------------------------------
 	void setup()
 	{
+		//mixer control panel
+		channelSelect.setMax(texGroups.size() - 1);//channel param
+
+		//slider channel selector
+		parameterPreview.add(channelSelect);
+
+		//TODO:
+		//add callbacks to set slider. repair get num channels api.. 
+		//paralel toggles to slide channel selector
+		bCh.clear();
+		bCh.resize(texGroups.size());
+		for (int i = 0; i < texGroups.size(); i++)
+		{
+			bCh[i].set("CH" + ofToString(i), false);
+			parameterPreview.add(bCh[i]);
+		}
+
+		parameterPreview.add(ENABLE_Solo);
+		parameterPreview.add(bReset);
+
 		//parameterGroup all channels packed 
 		parameterGroup.clear();
 		parameterGroup.setName("MIXER");
+		parameterGroup.add(parameterPreview);
 
-		//mixer control panel
-		channelSelect.setMax(texGroups.size() - 1);//channel param
-		parameterGroup.add(parameterPreview);//enable solo param
-		channelSelect.addListener(this, &Mixer::Changed_channelSelect);//callback
+		channelSelect.addListener(this, &Mixer::Changed_channelSelect);//slider selector callback
+
+		//--
 
 		for (int i = 0; i < texGroups.size(); i++)
 		{
@@ -433,7 +456,7 @@ public:
 		ofPopMatrix();
 	}
 
-	//-
+	//--
 
 	//add layers
 	//--------------------------------------------------------------
@@ -473,7 +496,7 @@ public:
 		channels.push_back(&channel);
 	}
 
-	//-
+	//--
 
 	//params getters
 	ofParameterGroup params_Empty{ "EMPTY" };//to return on error
@@ -541,7 +564,7 @@ public:
 	//methods to control object by external gui or by code
 	//easy callback to update gui when params change
 
-//private:
+	//private:
 
 	bool bGuiMustUpdate = false;
 	bool bChangedColor = false;
@@ -564,6 +587,18 @@ public:
 	void Changed_channelSelect(int & channelSelect)
 	{
 		bGuiMustUpdate = true;
+
+		for (int i = 0; i < texGroups.size(); i++)
+		{
+			if (i == channelSelect)
+			{
+				bCh[i] = true;
+			}
+			else
+			{
+				bCh[i] = false;
+			}
+		}
 	}
 
 	bool isChangedColor()
@@ -611,6 +646,13 @@ public:
 		return channelSelect.getMax();
 	}
 
+	int getNumChannels()
+	{
+		//int _numChannels = channelSelect.getMax() - 1;
+		int _numChannels = channels.size();
+		return _numChannels;
+	}
+
 	void selectChannel(int _channel)
 	{
 		if (_channel <= channelSelect.getMax() && _channel >= 0)
@@ -640,10 +682,10 @@ public:
 
 	//--------------------------------------------------------------
 
-//private:
-//public:
+	//private:
+	//public:
 
-	//--------------------------------------------------------------
+		//--------------------------------------------------------------
 	void generateShader()
 	{
 		//GENERATE THE SHADER
