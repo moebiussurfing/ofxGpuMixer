@@ -184,11 +184,15 @@ public:
 
 	//control pannel
 	vector<BasicChannel*> channels;
-	ofParameter<bool> doPreview{ "SOLO", false };
+	ofParameter<bool> ENABLE_Solo{ "SOLO", false };
 	ofParameter<int> channelSelect{ "CHANNEL", 0, 0, 0 };
 	ofParameter<bool> bReset{ "RESET", false };
 
-	ofParameterGroup parameterPreview{ "PREVIEW", doPreview, channelSelect, bReset };
+	ofParameterGroup parameterPreview{ "PREVIEW", channelSelect, ENABLE_Solo, bReset };
+
+	//ofParameter<bool> bCh0{ "CH0", false };
+	//ofParameter<bool> bCh1{ "CH1", false };
+	//ofParameter<bool> bCh2{ "CH2", false };
 
 	//--
 
@@ -372,7 +376,7 @@ public:
 	{
 		ofPushMatrix();
 
-		if (doPreview)
+		if (ENABLE_Solo)
 		{
 			shaderSingleChannel.begin();
 			{
@@ -472,23 +476,49 @@ public:
 	//-
 
 	//params getters
+	ofParameterGroup params_Empty{ "EMPTY" };//to return on error
+	//TODO: not used but must return something..
+
 	//--------------------------------------------------------------
 	ofParameterGroup& getParameterGroup() { return parameterGroup; }
 
-	//separated panels to imrpove group folding
+	//separated group panels to improve gui groups folding
 	//--------------------------------------------------------------
 	ofParameterGroup& getParameterGroupPreview() { return parameterPreview; }
-	
+
 	//--------------------------------------------------------------
-	ofParameterGroup& getParameterGroupChannel(int i)
+	ofParameterGroup& getParameterGroupChannel(int i)//both blend & tint params
 	{
 		if (i < texGroups.size())
 			return texGroups[i].parameters;
 		else
 		{
-			//TODO: not used but must return something..
 			ofLogError("Mixer") << "getParameterGroupChannel : channel out of range!";
-			return parameterPreview;
+			return params_Empty;
+		}
+	}
+
+	//--------------------------------------------------------------
+	ofParameterGroup& getParameterGroupChannelBlend(int i)//blend params only
+	{
+		if (i < texGroups.size())
+			return texGroups[i].parametersBlend;
+		else
+		{
+			ofLogError("Mixer") << "getParameterGroupChannel : channel out of range!";
+			return params_Empty;
+		}
+	}
+
+	//--------------------------------------------------------------
+	ofParameterGroup& getParameterGroupChannelTint(int i)//tint params only
+	{
+		if (i < texGroups.size())
+			return texGroups[i].parametersTint;
+		else
+		{
+			ofLogError("Mixer") << "getParameterGroupChannel : channel out of range!";
+			return params_Empty;
 		}
 	}
 
@@ -568,12 +598,12 @@ public:
 
 	void setSolo(bool b)
 	{
-		doPreview = b;
+		ENABLE_Solo = b;
 	}
 
 	void toggleSolo()
 	{
-		doPreview = !doPreview.get();
+		ENABLE_Solo = !ENABLE_Solo.get();
 	}
 
 	int getLastChannel()
