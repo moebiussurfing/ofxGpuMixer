@@ -191,11 +191,8 @@ public:
 	ofParameterGroup parameterPreview{ "PREVIEW" };
 	//ofParameterGroup parameterPreview{ "PREVIEW", channelSelect, ENABLE_Solo, bReset };
 
+	//TODO:
 	vector <ofParameter<bool>> bCh;
-
-	//ofParameter<bool> bCh0{ "CH0", false };
-	//ofParameter<bool> bCh1{ "CH1", false };
-	//ofParameter<bool> bCh2{ "CH2", false };
 
 	//--
 
@@ -209,10 +206,12 @@ public:
 	//--------------------------------------------------------------
 	void reset()
 	{
+		ofLogNotice(__FUNCTION__);
+
 		for (int i = 0; i < texGroups.size(); i++)
 		{
 			//channel callback
-			if (i != 0)//TODO: custom mode with chgannel 0 as background+
+			if (i != 0)//TODO: custom mode with channel 0 as background
 			{
 				texGroups[i].DISABLE_CALLBACKS = true;
 				texGroups[i].colorTint = ofColor(0);
@@ -234,16 +233,16 @@ public:
 		//slider channel selector
 		parameterPreview.add(channelSelect);
 
-		//TODO:
-		//add callbacks to set slider. repair get num channels api.. 
-		//paralel toggles to slide channel selector
-		bCh.clear();
-		bCh.resize(texGroups.size());
-		for (int i = 0; i < texGroups.size(); i++)
-		{
-			bCh[i].set("CH" + ofToString(i), false);
-			parameterPreview.add(bCh[i]);
-		}
+		////TODO:
+		////add callbacks to set slider. repair get num channels api.. 
+		////paralel toggles to slide channel selector
+		//bCh.clear();
+		//bCh.resize(texGroups.size());
+		//for (int i = 0; i < texGroups.size(); i++)
+		//{
+		//	bCh[i].set("CH" + ofToString(i), false);
+		//	parameterPreview.add(bCh[i]);
+		//}
 
 		parameterPreview.add(ENABLE_Solo);
 		parameterPreview.add(bReset);
@@ -289,6 +288,41 @@ public:
 	}
 
 	//--------------------------------------------------------------
+	void doResetMixer()
+	{
+		//ch0
+		//set bg black
+		(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
+		texGroups[0].opacity = 1;
+
+		//TODO:
+		//add reset method into inside class
+		//ch1
+		texGroups[1].hue = 0;
+		texGroups[1].saturation = 0;
+		texGroups[1].brightness = 0;
+		texGroups[1].tintAmt = 0;
+		texGroups[1].contrast = 1.0;
+		texGroups[1].gain = 1;
+		texGroups[1].opacity = 1;
+		texGroups[1].blendMode = 10;
+
+		//ch2
+		texGroups[2].hue = 0;
+		texGroups[2].saturation = 0;
+		texGroups[2].brightness = 0;
+		texGroups[2].tintAmt = 0;
+		texGroups[2].contrast = 1.0;
+		texGroups[2].gain = 1;
+		texGroups[2].opacity = 1;
+		texGroups[2].blendMode = 10;
+
+		//TODO:
+		////NOTE: this is for my custom/typical mixer configuration/features: 
+		////background color layer + 2 channels
+	}
+
+	//--------------------------------------------------------------
 	void Changed_params(ofAbstractParameter &e)
 	{
 		if (!DISABLE_CALLBACKS)
@@ -313,36 +347,7 @@ public:
 				{
 					bReset = false;
 
-					//ch0
-					//set bg black
-					(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
-					texGroups[0].opacity = 1;
-
-					//TODO:
-					//add reset method into inside class
-					//ch1
-					texGroups[1].hue = 0;
-					texGroups[1].saturation = 0;
-					texGroups[1].brightness = 0;
-					texGroups[1].tintAmt = 0;
-					texGroups[1].contrast = 0;
-					texGroups[1].gain = 1;
-					texGroups[1].opacity = 1;
-					texGroups[1].blendMode = 10;
-
-					//ch2
-					texGroups[2].hue = 0;
-					texGroups[2].saturation = 0;
-					texGroups[2].brightness = 0;
-					texGroups[2].tintAmt = 0;
-					texGroups[2].contrast = 0;
-					texGroups[2].gain = 1;
-					texGroups[2].opacity = 1;
-					texGroups[2].blendMode = 10;
-
-					//TODO:
-					////NOTE: this is for my custom/typical mixer configuration/features: 
-					////background color layer + 2 channels
+					doResetMixer();
 				}
 				DISABLE_CALLBACKS = false;
 			}
@@ -588,17 +593,18 @@ public:
 	{
 		bGuiMustUpdate = true;
 
-		for (int i = 0; i < texGroups.size(); i++)
-		{
-			if (i == channelSelect)
-			{
-				bCh[i] = true;
-			}
-			else
-			{
-				bCh[i] = false;
-			}
-		}
+		////TODO:
+		//for (int i = 0; i < texGroups.size(); i++)
+		//{
+		//	if (i == channelSelect)
+		//	{
+		//		bCh[i] = true;
+		//	}
+		//	else
+		//	{
+		//		bCh[i] = false;
+		//	}
+		//}
 	}
 
 	bool isChangedColor()
@@ -663,6 +669,14 @@ public:
 	{
 		if (_blendMode <= texGroups[channelSelect.get()].blendMode.getMax())
 			texGroups[channelSelect.get()].blendMode = _blendMode;
+	}
+
+	void setBlendModeToChannel(int _blendMode, int _chan)
+	{
+		if (_chan <= channelSelect.getMax()) {
+			if (_blendMode <= texGroups[_chan].blendMode.getMax())
+				texGroups[_chan].blendMode = _blendMode;
+		}
 	}
 
 	int getLastBlendMode()
@@ -839,7 +853,7 @@ public:
 		fboMix.draw(0, 0, ofGetWidth(), ofGetHeight());
 	}
 	//--------------------------------------------------------------
-	void drawFbo(int x, int y, int w, int h)
+	void drawFbo(int x, int y, int w, int h)//using an fbo to v flip..
 	{
 		fboMix.draw(x, y, w, h);
 	}
