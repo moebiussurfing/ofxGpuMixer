@@ -1,3 +1,0 @@
-ofxAutoReloadedShader
-ofxGpuMixer
-ofxGui

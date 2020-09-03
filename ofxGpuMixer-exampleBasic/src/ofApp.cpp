@@ -3,31 +3,32 @@
 //--------------------------------------------------------------
 void ofApp::setup()
 {
-	ofSetFrameRate(25);
-	ofSetVerticalSync(false);
+	ofSetFrameRate(60);
+	ofSetVerticalSync(true);
 
 	//-
 
 	//1. prepare channels
 
-	//channel 0
+	//channel 0 (background for tint)
 	colorBackground.set("BACKGROUND", ofColor(0, 0, 0), ofColor(0, 0, 0), ofColor(255, 255, 255));
 	colorChannel.setup(colorBackground.getName(), colorBackground.get(), ofGetWidth(), ofGetHeight());
 
 	//channel 1
-	fboA.allocate(ofGetWidth(), ofGetHeight());
+	fbo1.allocate(ofGetWidth(), ofGetHeight());
 
 	//channel 2
-	fboB.allocate(ofGetWidth(), ofGetHeight());
-	//texB = fboB.getTexture();//adding a texture insted of a fbo
+	fbo2.allocate(ofGetWidth(), ofGetHeight());
+	//this is an alternative mode using textures insted ofFbo. not much tested but should work..
+	//texB = fbo2.getTexture();//adding a texture insted of a fbo
 
 	//-
 
 	//2. configure mixer
 	mixer.addChannel(colorChannel, ofxGpuMixer::BLEND_ADD);
-	mixer.addChannel(fboA, "CHANNEL 1", ofxGpuMixer::BLEND_ADD);
-	mixer.addChannel(fboB, "CHANNEL 2", ofxGpuMixer::BLEND_ADD);
-	//mixer.addChannel(texB, "CHANNEL 2", ofxGpuMixer::BLEND_ADD);
+	mixer.addChannel(fbo1, "CHANNEL 1", ofxGpuMixer::BLEND_ADD);
+	mixer.addChannel(fbo2, "CHANNEL 2", ofxGpuMixer::BLEND_ADD);
+	//mixer.addChannel(texB, "CHANNEL 3", ofxGpuMixer::BLEND_ADD);//alternative mode using textures instead of fbo
 
 	//-
 
@@ -37,35 +38,41 @@ void ofApp::setup()
 	//-
 
 	//gui
-	//gui.setup(mixer.getParameterGroup());
 
-	gui.setup("MIXER");
-	gui.add(mixer.getParameterGroupPreview());
-	gui.add(mixer.getParameterGroupChannel(0));
-	gui.add(mixer.getParameterGroupChannel(1));
-	gui.add(mixer.getParameterGroupChannel(2));
+	//A. a simple gui build using main group of parameters
+	gui.setup(mixer.getParameterGroup());
+
+	////B. a custom gui
+	////this is an example of a customized gui panel for this app
+	////that's why we add the used/desired channels to our gui
+	//gui.setup("MIXER");
+	//gui.add(mixer.getParameterGroupPreview());
+	//gui.add(mixer.getParameterGroupChannel(0));
+	//gui.add(mixer.getParameterGroupChannel(1));
+	//gui.add(mixer.getParameterGroupChannel(2));
+
+	//-
 
 	//settings
+	//we handle the settings as usual in OF using an ofParameterGroup
 	params_mixerSettings.add(colorBackground);//ch0 bg
 	params_mixerSettings.add(mixer.getParameterGroup());//all params together
-
-
+	
 	//----
 
 	//startup
 
+	mixer.reset();//kind of startup reset
+
+	//load settings
+	loadParams(params_mixerSettings, path_mixerSettings);
+
+	//sub panels are interactive to collapse
 	refreshGui_Mixer();
 
-	//TODO:
-	//this is a workaround to do a kind of refresh of gui/params to avoid crashes when we pick the color controls
-	//before hsb params changed..
-	//but must be called out of addon, maybe bc it's added to gui at ofApp?
-	mixer.reset();
-
-	//load
-	//TODO:
-	//crashes
-	loadParams(params_mixerSettings, path_mixerSettings);
+	//our scene testing
+	scene.setText1("testing");
+	scene.setText2("ofxGpuMixer");
 
 	//----
 }
@@ -73,21 +80,25 @@ void ofApp::setup()
 //--------------------------------------------------------------
 void ofApp::update()
 {
-	//mixer
+	//feed layer channel 1
 
-	fboA.begin();
+	fbo1.begin();
 	{
 		ofClear(0, 255);
 		scene.drawChannel1();
 	}
-	fboA.end();
+	fbo1.end();
 
-	fboB.begin();
+	//-
+
+	//feed layer channel 2
+
+	fbo2.begin();
 	{
 		ofClear(0, 255);
 		scene.drawChannel2();
 	}
-	fboB.end();
+	fbo2.end();
 
 	//-
 
@@ -95,16 +106,21 @@ void ofApp::update()
 
 	//-
 
-	//easy callback
-	if (mixer.isUpdated())
+	//easy callbacks to make gui interactive
+
+	if (mixer.isChangedSelector())
 	{
 		refreshGui_Mixer();
 	}
-
+	//background color changed
 	if (mixer.isChangedColor())
 	{
 		colorBackground = mixer.getColorChannel0();
 	}
+	//if (mixer.isUpdated())
+	//{
+	//	refreshGui_Mixer();
+	//}
 }
 
 //--------------------------------------------------------------
@@ -112,8 +128,7 @@ void ofApp::draw()
 {
 	ofBackground(0);
 
-	mixer.drawFbo(0, 0, ofGetWidth(), ofGetHeight());//to v flip
-	//mixer.draw(0, 0, ofGetWidth(), ofGetHeight());
+	mixer.drawFbo(0, 0, ofGetWidth(), ofGetHeight());
 
 	//-
 
@@ -130,23 +145,11 @@ void ofApp::exit()
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-	//scene
-	if (key == 'S')
-	{
-		scene.setGuiVisible(!scene.getGuiVisible());
-	}
-	else if (key == 'B')
-	{
-		scene.setModeColorsToggle();
-	}
-	else if (key == 'R')
-	{
-		scene.setModeRandomizeToggle();
-	}
-
-	//-
+	//--
 
 	//mixer
+	//a browsing gui system to navigate sub menus
+	
 	if (key == OF_KEY_RIGHT)
 	{
 		if (mixer.channelSelect.get() != 0)//except channel 0 background
@@ -231,60 +234,34 @@ void ofApp::keyPressed(int key)
 	{
 		mixer.toggleSolo();
 	}
-}
 
-//--------------------------------------------------------------
-void ofApp::keyReleased(int key) {
+	//--
 
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y) {
-
+	//scene
+	//scene.keyPressed(key);
+	if (key == 'S')
+	{
+		scene.setGuiVisible(!scene.getGuiVisible());
+	}
+	else if (key == 'B')
+	{
+		scene.setModeColorsToggle();
+	}
+	else if (key == 'R')
+	{
+		scene.setModeRandomizeToggle();
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h) {
+	//TODO:
 	//BUG:
 	//we can't resize fbo's yet! it freezes contents
-	//fboA.allocate(w, h);
-	//fboB.allocate(w, h);
+	//fbo1.allocate(w, h);
+	//fbo2.allocate(w, h);
+
 	mixer.fboResize(w, h);
-}
-
-//--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg) {
-
-}
-
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo) {
-
 }
 
 //--------------------------------------------------------------
@@ -305,25 +282,10 @@ void ofApp::saveParams(ofParameterGroup &g, string path)
 	settings.save(path);
 }
 
-
 //--------------------------------------------------------------
 void ofApp::refreshGui_Mixer()
 {
 	ofLogVerbose("ofApp") << "refreshGui_Mixer()";
-
-	//collapse groups
-
-////#ifdef INCLUDE_MIXER_MODE
-//    //gui.minimizeAll();
-//    //auto gMixer0 = gui.getGroup("MIXER SETTINGS");
-//    //auto gMixer = gMixer0.getGroup("MIXER");
-//    auto &gMixer = gui.getGroup("MIXER");
-//    //gMixer.minimize();
-//
-//    auto &gCh0 = gMixer.getGroup("BACKGROUND");
-//    auto &gCh1 = gMixer.getGroup("CHANNEL 1");
-//    auto &gCh2 = gMixer.getGroup("CHANNEL 2");
-//    auto &gPrv = gMixer.getGroup("PREVIEW");
 
 	auto &gCh0 = gui.getGroup("BACKGROUND");
 	auto &gCh1 = gui.getGroup("CHANNEL 1");
