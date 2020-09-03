@@ -18,6 +18,7 @@ https://github.com/jonasfehr/ofxGpuMixer
 ### ofApp.h
 ```.cpp
 #include "ofxGpuMixer.h"
+
 ofxGpuMixer::Mixer mixer;
     
 ofFbo fboA;
