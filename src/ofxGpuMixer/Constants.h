@@ -1,11 +1,9 @@
 #pragma once
 
-
 #define OFX_GPUMIXER_BEGIN_NAMESPACE namespace ofx { namespace GpuMixer {
 #define OFX_GPUMIXER_END_NAMESPACE } }
 
 OFX_GPUMIXER_BEGIN_NAMESPACE
-
 
 enum BlendModes_Mixer : int {
     BLEND_PASS = 0,
@@ -18,8 +16,7 @@ enum BlendModes_Mixer : int {
     BLEND_AVERAGE = 7,
     BLEND_SOFT_LIGHT = 8,
     BLEND_OVERLAY = 9,
-    BLEND_ONTOP = 10,
-    PASS_THROUGH = 11
+    PASS_THROUGH = 10
 };
 
 enum ShaderTypes : int{
@@ -29,9 +26,5 @@ enum ShaderTypes : int{
 };
 
 OFX_GPUMIXER_END_NAMESPACE
-
-
-
-
 
 namespace ofxGpuMixer = ofx::GpuMixer;
