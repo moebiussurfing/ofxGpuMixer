@@ -11,7 +11,7 @@ https://github.com/jonasfehr/ofxGpuMixer
 ![image](readme_images/Capture.PNG?raw=true "image")
 
 ## Features
-- 
+- Run the example...
 
 ## Usage
  
@@ -37,6 +37,7 @@ ofApp::setup(){
 
     mixer.addChannel(colorChannel, ofxGpuMixer::BLEND_ADD);
     mixer.addChannel(fboA,"A", ofxGpuMixer::BLEND_ADD);
+    mixer.addChannel(fboB,"B", ofxGpuMixer::BLEND_ADD);
     //mixer.addChannel(texB,"B", ofxGpuMixer::BLEND_ADD);
 
     mixer.setup(); // Creates the shader in order to mix.
@@ -72,12 +73,6 @@ https://github.com/moebiussurfing/ofxSceneTEST (only for the example but easy to
 
 ## Tested systems
 - **Windows10** / **VS2017** / **OF 0.11**
-
-### TODO/IDEAS
-* 
-
-### Notes
-*
 
 ## Author
 Addon coded by **jonasfehr**. 
