@@ -19,6 +19,10 @@ class TextureGroup //: public ofBaseApp
 {
 
 public:
+	TextureGroup() {};
+	~TextureGroup() {
+		ofRemoveListener(parameters.parameterChangedE(), this, &TextureGroup::Changed_params);
+	};
 
 	//private:
 	//ofEventListeners listener2;
@@ -176,6 +180,12 @@ class Mixer// : public ofBaseApp
 {
 
 public:
+	Mixer() {};
+	~Mixer() {
+		ofRemoveListener(parameterGroup.parameterChangedE(), this, &Mixer::Changed_params);
+		channelSelect.removeListener(this, &Mixer::Changed_channelSelect);//slider selector callback
+
+	};
 
 	//--
 
