@@ -11,6 +11,8 @@
 
 OFX_GPUMIXER_BEGIN_NAMESPACE
 
+//#define USE_HUE_SAT_BRG_CONTROLS	//usefull when not using agui system without colour picker and want to use HSB
+
 //--------------------------------------------------------------
 
 class TextureGroup //: public ofBaseApp
@@ -67,8 +69,11 @@ public:
 		parametersTint.setName("TINT");
 		//parameters.setName("CHANNEL");
 
-		parametersBlend.add(blendModeName, blendMode, opacity, gain, contrast);
-		parametersTint.add(colorTint, hue, saturation, brightness, tintAmt);
+		parametersBlend.add(blendMode, blendModeName, opacity, gain, contrast);
+		parametersTint.add(tintAmt, colorTint);
+#ifdef USE_HUE_SAT_BRG_CONTROLS
+		parametersTint.add(hue, saturation, brightness);//TODO: hide not required controls bc we have color picker
+#endif
 		parameters.add(parametersBlend, parametersTint);//both groups nested
 
 		//-
@@ -107,6 +112,7 @@ public:
 				this->brightness = colorTint.get().getBrightness() / 255.f;
 				DISABLE_CALLBACKS = false;
 			}
+#ifdef USE_HUE_SAT_BRG_CONTROLS
 			else if (name == "HUE")
 			{
 				DISABLE_CALLBACKS = true;
@@ -137,6 +143,7 @@ public:
 				brightness = colorTint.get().getBrightness() / 255.f;
 				DISABLE_CALLBACKS = false;
 			}
+#endif
 		}
 	}
 
@@ -214,7 +221,7 @@ public:
 			if (i != 0)//TODO: custom mode with channel 0 as background
 			{
 				texGroups[i].DISABLE_CALLBACKS = true;
-				texGroups[i].colorTint = ofColor(0);
+				texGroups[i].colorTint = ofColor(0,0,0);
 				texGroups[i].tintAmt = 0.f;
 				texGroups[i].hue = texGroups[i].colorTint.get().getHue() / 255.f;
 				texGroups[i].saturation = texGroups[i].colorTint.get().getSaturation() / 255.f;
@@ -293,7 +300,7 @@ public:
 		//ch0
 		//set bg black
 		(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
-		texGroups[0].opacity = 1;
+		texGroups[0].opacity = 0;
 
 		//TODO:
 		//add reset method into inside class
@@ -622,7 +629,8 @@ public:
 
 	ofColor getColorChannel0()
 	{
-		if (channels[0]->name == "BACKGROUND" && texGroups[0].name == "BACKGROUND")
+		if (texGroups[0].name == "BACKGROUND")
+		//if (channels[0]->name == "BACKGROUND" && texGroups[0].name == "BACKGROUND")
 		{
 			return  channels[0]->parameterGroup.getColor("COLOR");
 		}
@@ -676,6 +684,13 @@ public:
 		if (_chan <= channelSelect.getMax()) {
 			if (_blendMode <= texGroups[_chan].blendMode.getMax())
 				texGroups[_chan].blendMode = _blendMode;
+		}
+	}
+
+	void setChannelTint(float _tint, int _chan)
+	{
+		if (_chan <= channelSelect.getMax()) {
+			texGroups[_chan].tintAmt = _tint;
 		}
 	}
 
@@ -807,6 +822,12 @@ public:
 		ofLogNotice("TextureGroup") << "blendModeName: [" << blendMode << "] " << s;
 
 		return s;
+	}
+
+	//--------------------------------------------------------------
+	int getNumBlendModes()
+	{
+		return 11;
 	}
 
 	//--
