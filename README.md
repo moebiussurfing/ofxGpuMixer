@@ -3,7 +3,7 @@ ofxGpuMixer
 
 # Overview
 **ofxGpuMixer** is an **openFrameworks** addon coded by @jonasfehr.  
-This is my personal fork with some minimal modifications to fit my needs.  
+This is my personal fork with an example and some minimal modifications to fit my needs.  
 Thanks *jonasfehr*!  
 https://github.com/jonasfehr/ofxGpuMixer  
 
@@ -22,9 +22,9 @@ ofxGpuMixer::Mixer mixer;
     
 ofFbo fboA;
 ofFbo fboB;
-ofTexture texB;
+//ofTexture texB;
     
-ofxGpuMixer::SimpleColorChannel colorChannel;
+//ofxGpuMixer::SimpleColorChannel colorChannel;
 ```
 
 ### ofApp.cpp
@@ -32,12 +32,12 @@ ofxGpuMixer::SimpleColorChannel colorChannel;
 ofApp::setup(){
     fboA.allocate(ofGetWidth(),ofGetHeight());
     fboB.allocate(ofGetWidth(),ofGetHeight());
-    texB = fboB.getTexture(); // adding a texture insted of a fbo
-    colorChannel.setup("Background", ofColor(255,0,0), ofGetWidth(),ofGetHeight());
+    //texB = fboB.getTexture(); // adding a texture insted of a fbo
+    //colorChannel.setup("Background", ofColor(255,0,0), ofGetWidth(),ofGetHeight());
 
     mixer.addChannel(colorChannel, ofxGpuMixer::BLEND_ADD);
     mixer.addChannel(fboA,"A", ofxGpuMixer::BLEND_ADD);
-    mixer.addChannel(texB,"B", ofxGpuMixer::BLEND_ADD);
+    //mixer.addChannel(texB,"B", ofxGpuMixer::BLEND_ADD);
 
     mixer.setup(); // Creates the shader in order to mix.
 }
@@ -46,14 +46,14 @@ ofApp::update(){
 	 fboA.begin();
     {
         ofBackground(0,255);
-        //draw scene 1
+        //draw scene channel 1
     }
     fboA.end();
     
     fboB.begin();
     {
         ofBackground(0,0,0);
-        //draw scene 2
+        //draw scene channel 2
     }
     fboB.end();
     
@@ -80,7 +80,7 @@ https://github.com/moebiussurfing/ofxSceneTEST (only for the example but easy to
 *
 
 ## Author
-Addon coded by **jonasfehr** 
+Addon coded by **jonasfehr**. 
 included example and some minimal modifications by **@moebiusSurfing**  
 *(ManuMolina). 2020.*
 
