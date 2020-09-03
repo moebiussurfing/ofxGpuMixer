@@ -23,9 +23,9 @@ public:
 	//private:
 	//ofEventListeners listener2;
 
+	ofParameterGroup parameters{ "TEXTURE" };
 	ofParameterGroup parametersBlend;
 	ofParameterGroup parametersTint;
-	ofParameterGroup parameters;
 
 	//TextureGroup()
 	//{
@@ -65,9 +65,9 @@ public:
 	//--------------------------------------------------------------
 	void setup()
 	{
+		//parameters.setName("CHANNEL");
 		parametersBlend.setName("BLEND");
 		parametersTint.setName("TINT");
-		//parameters.setName("CHANNEL");
 
 		parametersBlend.add(blendMode, blendModeName, opacity, gain, contrast);
 		parametersTint.add(tintAmt, colorTint);
@@ -221,7 +221,7 @@ public:
 			if (i != 0)//TODO: custom mode with channel 0 as background
 			{
 				texGroups[i].DISABLE_CALLBACKS = true;
-				texGroups[i].colorTint = ofColor(0,0,0);
+				texGroups[i].colorTint = ofColor(0, 0, 0);
 				texGroups[i].tintAmt = 0.f;
 				texGroups[i].hue = texGroups[i].colorTint.get().getHue() / 255.f;
 				texGroups[i].saturation = texGroups[i].colorTint.get().getSaturation() / 255.f;
@@ -237,8 +237,14 @@ public:
 		//mixer control panel
 		channelSelect.setMax(texGroups.size() - 1);//channel param
 
+		//exclude
+		channelSelect.setSerializable(false);
+		bReset.setSerializable(false);
+
 		//slider channel selector
 		parameterPreview.add(channelSelect);
+		parameterPreview.add(ENABLE_Solo);
+		parameterPreview.add(bReset);
 
 		////TODO:
 		////add callbacks to set slider. repair get num channels api.. 
@@ -251,30 +257,36 @@ public:
 		//	parameterPreview.add(bCh[i]);
 		//}
 
-		parameterPreview.add(ENABLE_Solo);
-		parameterPreview.add(bReset);
-
 		//parameterGroup all channels packed 
-		parameterGroup.clear();
+		//parameterGroup.clear();
 		parameterGroup.setName("MIXER");
 		parameterGroup.add(parameterPreview);
-
-		channelSelect.addListener(this, &Mixer::Changed_channelSelect);//slider selector callback
 
 		//--
 
 		for (int i = 0; i < texGroups.size(); i++)
 		{
 			//channel callback
-			if (i != 0)//TODO: custom mode with chgannel 0 as background
+			if (i != 0)//TODO: custom mode with channel 0 as background
 				texGroups[i].setup();
 
 			parameterGroup.add(texGroups[i].parameters);
 		}
 
+		////TODO:
+		//for (int i = 0; i < texGroups.size(); i++)
+		//{
+		//	texGroups[i].setup();
+		//	parameterGroup.add(getParameterGroupChannel(i));
+		//}
+
+		//--
+
 		//mixer callback
 		ofAddListener(parameterGroup.parameterChangedE(), this, &Mixer::Changed_params);
 		//remove listener is pending..
+
+		channelSelect.addListener(this, &Mixer::Changed_channelSelect);//slider selector callback
 
 		//--
 
@@ -301,6 +313,7 @@ public:
 		//set bg black
 		(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
 		texGroups[0].opacity = 0;
+		texGroups[0].colorTint = ofColor(0, 0, 0);
 
 		//TODO:
 		//add reset method into inside class
@@ -580,6 +593,7 @@ public:
 
 	bool bGuiMustUpdate = false;
 	bool bChangedColor = false;
+	bool bChangedSelector = false;
 
 	//public:
 
@@ -596,9 +610,22 @@ public:
 		}
 	}
 
+	bool isChangedSelector()
+	{
+		if (bChangedSelector)
+		{
+			bChangedSelector = false;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	void Changed_channelSelect(int & channelSelect)
 	{
-		bGuiMustUpdate = true;
+		bChangedSelector = true;
 
 		////TODO:
 		//for (int i = 0; i < texGroups.size(); i++)
@@ -630,7 +657,7 @@ public:
 	ofColor getColorChannel0()
 	{
 		if (texGroups[0].name == "BACKGROUND")
-		//if (channels[0]->name == "BACKGROUND" && texGroups[0].name == "BACKGROUND")
+			//if (channels[0]->name == "BACKGROUND" && texGroups[0].name == "BACKGROUND")
 		{
 			return  channels[0]->parameterGroup.getColor("COLOR");
 		}
@@ -691,6 +718,12 @@ public:
 	{
 		if (_chan <= channelSelect.getMax()) {
 			texGroups[_chan].tintAmt = _tint;
+		}
+	}
+	void setChannelTintColor(ofColor _c, int _chan)
+	{
+		if (_chan <= channelSelect.getMax()) {
+			texGroups[_chan].colorTint = _c;
 		}
 	}
 
