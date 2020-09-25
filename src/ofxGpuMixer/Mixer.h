@@ -80,6 +80,11 @@ public:
 #endif
 		parameters.add(parametersBlend, parametersTint);//both groups nested
 
+		//exclude
+		hue.setSerializable(false);
+		saturation.setSerializable(false);
+		brightness.setSerializable(false);
+		
 		//-
 
 		//callback
@@ -106,7 +111,7 @@ public:
 			string name = e.getName();
 
 			if (name != "")
-				ofLogNotice("TextureGroup") << "Changed_params: " << name << ": " << e;
+				ofLogNotice(__FUNCTION__) << "Changed_params: " << name << " : " << e;
 
 			if (name == "COLOR TINT")
 			{
@@ -116,6 +121,7 @@ public:
 				this->brightness = colorTint.get().getBrightness() / 255.f;
 				DISABLE_CALLBACKS = false;
 			}
+
 #ifdef USE_HUE_SAT_BRG_CONTROLS
 			else if (name == "HUE")
 			{
@@ -238,6 +244,8 @@ public:
 				texGroups[i].brightness = texGroups[i].colorTint.get().getBrightness() / 255.f;
 				texGroups[i].DISABLE_CALLBACKS = false;
 			}
+
+			setChannelTintColor(ofColor(0, 0, 0), i);
 		}
 	}
 
@@ -321,7 +329,7 @@ public:
 	{
 		//ch0
 		//set bg black
-		(channels[0]->parameterGroup.getColor("COLOR")) = ofColor::black;
+		(channels[0]->parameterGroup.getColor("COLOR")) = ofColor(0, 0, 0);
 		texGroups[0].opacity = 0;
 		texGroups[0].colorTint = ofColor(0, 0, 0);
 
@@ -365,14 +373,14 @@ public:
 			if (name == "COLOR")
 			{
 				DISABLE_CALLBACKS = true;
-				ofLogNotice("Mixer") << "COLOR: " << e;
+				ofLogNotice(__FUNCTION__) << "COLOR: " << e;
 				bChangedColor = true;
 				DISABLE_CALLBACKS = false;
 			}
 			else if (name == "RESET")
 			{
 				DISABLE_CALLBACKS = true;
-				ofLogNotice("Mixer") << "RESET: " << e;
+				ofLogNotice(__FUNCTION__) << "RESET: " << e;
 				if (bReset)
 				{
 					bReset = false;
@@ -390,7 +398,7 @@ public:
 		////debug
 		//int it = 0;
 		//int ic = 0;
-		//ofLogNotice("TextureGroup") << "";
+		//ofLogNotice(__FUNCTION__) << "";
 
 		//must add '&' to enable (read and) write too
 		for (auto & t : texGroups)
@@ -402,10 +410,10 @@ public:
 					c->update();
 				}
 
-				//ofLogNotice("TextureGroup") << "c: [" << ic << "] " << c->name;
+				//ofLogNotice(__FUNCTION__) << "c: [" << ic << "] " << c->name;
 				//ic++;
 			}
-			//ofLogNotice("TextureGroup") << "t: [" << it << "] " << t.name;
+			//ofLogNotice(__FUNCTION__) << "t: [" << it << "] " << t.name;
 
 			//to set blend mode gui name
 			if (t.blendMode != t.blendMode_PRE)
@@ -419,8 +427,8 @@ public:
 				ofStringReplace(message, "BLEND_", "");
 				t.blendModeName = message;
 
-				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode_PRE: " << t.blendMode_PRE;
-				//ofLogNotice("TextureGroup") << "[" << it << "] t.blendMode: " << t.blendMode;
+				//ofLogNotice(__FUNCTION__) << "[" << it << "] t.blendMode_PRE: " << t.blendMode_PRE;
+				//ofLogNotice(__FUNCTION__) << "[" << it << "] t.blendMode: " << t.blendMode;
 			}
 			//it++;
 		}
@@ -787,7 +795,7 @@ public:
 	//--------------------------------------------------------------
 	void generateShaderSingleChannel()
 	{
-		//GENERATE THE SHADER
+		//generate the shader
 		stringstream shaderScript;
 		shaderScript << "#version 120" << endl;
 		shaderScript << uniformsHeader;
@@ -859,10 +867,10 @@ public:
 			break;
 		default:
 			s = "unknown blendMode";
-			ofLogError("TextureGroup") << "unknown blendMode: " << blendMode;
+			ofLogError(__FUNCTION__) << "unknown blendMode: " << blendMode;
 			break;
 		}
-		ofLogNotice("TextureGroup") << "blendModeName: [" << blendMode << "] " << s;
+		ofLogNotice(__FUNCTION__) << "blendModeName: [" << blendMode << "] " << s;
 
 		return s;
 	}

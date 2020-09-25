@@ -5,6 +5,7 @@ ofxGpuMixer
 **ofxGpuMixer** is an **openFrameworks** addon coded by @jonasfehr.  
 This is my personal fork with an example and some minimal modifications to fit my needs.  
 Thanks *jonasfehr*!  
+Original repository:  
 https://github.com/jonasfehr/ofxGpuMixer  
 
 ## Screenshot
@@ -63,7 +64,7 @@ ofApp::update(){
 }
 
 ofApp::draw(){
-  	ofBackground(0);
+    ofBackground(0);
     ofSetColor(255);
     mixer.draw(0,0,ofGetWidth(), ofGetHeight());
 }
